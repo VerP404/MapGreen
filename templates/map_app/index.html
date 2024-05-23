@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Зеленая Карта</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 94vh;
+            width: 100%;
+            margin-top: 50px;
+        }
+
+        .sidebar {
+            position: absolute;
+            top: 56px;
+            left: 5px;
+            width: 290px;
+            height: calc(100vh - 61px);
+            background: rgba(248, 249, 250, 0.9);
+            overflow-y: auto;
+            z-index: 1000;
+            padding: 5px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .navbar {
+            z-index: 1001;
+        }
+
+        .sidebar h6 {
+            margin-top: 20px;
+        }
+
+        .sidebar .list-unstyled li a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .sidebar .list-unstyled li a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+
+        .legend {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .legend li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        .toggle-sidebar-btn {
+            position: absolute;
+            top: 50%;
+            left: 5px;
+            z-index: 1002;
+            width: auto;
+        }
+
+        .legend span[data-color] {
+            background-color: var(--color);
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="#">Зеленая Карта</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" href="#">О проекте</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Контакты</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Войти</a></li>
+        </ul>
+    </div>
+</nav>
+
+<button class="btn btn-primary toggle-sidebar-btn"><</button>
+<div class="sidebar">
+    <input type="text" class="form-control mb-3" placeholder="Начните печатать здесь, чтобы найти проекты">
+    <div>
+        <h6>Качество проектов</h6>
+        <p>Проекты курируются администраторами Зеленой Карты и отображаются только проекты самого высокого качества,
+            содержащие исследовательские данные.</p>
+        <h6>Категории</h6>
+        <ul class="legend">
+            {% for type in types %}
+                <li>
+                    <span style="background-color: {{ type.color }}"></span><a href="#">{{ type.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div id="map"></div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.72.0/L.Control.Locate.min.js"></script>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.72.0/L.Control.Locate.min.css"/>
+
+<script>
+    var map = L.map('map').setView([55.755864, 37.617698], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add objects to map
+    var objects = {{ objects|safe }};
+    objects.forEach(function (obj) {
+        L.marker([obj.latitude, obj.longitude]).addTo(map)
+            .bindPopup('<b>' + obj.name + '</b><br />' + obj.description);
+    });
+
+    // Toggle sidebar
+    document.querySelector('.toggle-sidebar-btn').addEventListener('click', function () {
+        var sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('collapsed');
+        this.textContent = sidebar.classList.contains('collapsed') ? '>' : '<';
+    });
+
+    // Move zoom controls to the top right
+    map.zoomControl.setPosition('topright');
+
+    // Add geolocation control
+    L.control.locate({
+        position: 'topright',
+        strings: {
+            title: '<i class="fas fa-location-arrow"></i> Показать мое местоположение'
+        },
+        locateOptions: {
+            enableHighAccuracy: true
+        }
+    }).addTo(map);
+
+    // Selected object type
+    var selectedObjectType = null;
+
+    // Add new object button
+    var newObjectBtn = L.control({position: 'bottomright'});
+    newObjectBtn.onAdd = function (map) {
+        var btnContainer = L.DomUtil.create('div', 'btn-container');
+        var pointBtn = L.DomUtil.create('button', 'btn btn-success', btnContainer);
+        var polygonBtn = L.DomUtil.create('button', 'btn btn-success', btnContainer);
+
+        pointBtn.textContent = 'Добавить точку';
+        polygonBtn.textContent = 'Добавить полигон';
+
+        pointBtn.onclick = function () {
+            selectedObjectType = 'point';
+            map.on('click', onMapClick);
+        };
+
+        polygonBtn.onclick = function () {
+            selectedObjectType = 'polygon';
+            polygonCoordinates = [];
+            map.on('click', onMapClick);
+        };
+
+        return btnContainer;
+    };
+    newObjectBtn.addTo(map);
+
+    // Store the polygon coordinates
+    var polygonCoordinates = [];
+
+    // Handle map click for adding new object
+    function onMapClick(e) {
+        if (selectedObjectType === 'point') {
+            handlePointClick(e);
+        } else if (selectedObjectType === 'polygon') {
+            handlePolygonClick(e);
+        }
+    }
+
+    function handlePointClick(e) {
+        map.off('click', onMapClick);
+        var latlng = e.latlng;
+        var popupContent = getPopupContent(latlng.lat, latlng.lng, null);
+        var popup = L.popup()
+            .setLatLng(latlng)
+            .setContent(popupContent)
+            .openOn(map);
+        setupFormSubmission(popup, latlng.lat, latlng.lng, null);
+    }
+
+    function handlePolygonClick(e) {
+        polygonCoordinates.push([e.latlng.lat, e.latlng.lng]);
+        L.polygon(polygonCoordinates).addTo(map);
+        if (polygonCoordinates.length >= 3) {
+            var popupContent = getPopupContent(null, null, polygonCoordinates);
+            var popup = L.popup()
+                .setLatLng(e.latlng)
+                .setContent(popupContent)
+                .openOn(map);
+            setupFormSubmission(popup, null, null, polygonCoordinates);
+            map.off('click', onMapClick);
+        }
+    }
+
+    function getPopupContent(lat, lng, polygon) {
+        return `
+            <form id="newObjectForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="objectName">Название</label>
+                    <input type="text" class="form-control" id="objectName" required>
+                </div>
+                <div class="form-group">
+                    <label for="objectDescription">Описание</label>
+                    <textarea class="form-control" id="objectDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="objectType">Тип</label>
+                    <select class="form-control" id="objectType" required>
+                        {% for type in types %}
+                        <option value="{{ type.id }}">{{ type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="hidden" id="objectLatitude" value="${lat || ''}">
+                <input type="hidden" id="objectLongitude" value="${lng || ''}">
+                <input type="hidden" id="objectPolygon" value='${polygon ? JSON.stringify(polygon) : ''}'>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        `;
+    }
+
+function setupFormSubmission(popup, lat, lng, polygon) {
+    var form = popup.getElement().querySelector('form');
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var formData = {
+            name: document.getElementById('objectName').value,
+            description: document.getElementById('objectDescription').value,
+            type: document.getElementById('objectType').value,
+            latitude: lat,
+            longitude: lng,
+            polygon: polygon ? JSON.stringify(polygon) : null
+        };
+        $.ajax({
+            type: 'POST',
+            url: '{% url "add_object" %}',
+            data: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            success: function () {
+                map.closePopup();
+                // Optionally reload the map or add the marker directly
+            }
+        });
+    });
+}
+    function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+    map.on('click', onMapClick);
+
+</script>
+
+</body>
+</html>
