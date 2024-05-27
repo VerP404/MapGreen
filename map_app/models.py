@@ -8,8 +8,6 @@ class TypeObject(models.Model):
 
     def __str__(self):
         return self.name
-
-
 class Object(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()

@@ -89,6 +89,44 @@
         .legend span[data-color] {
             background-color: var(--color);
         }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .project-type-modal,
+        .category-modal {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .project-type-modal button,
+        .category-modal button {
+            margin-right: 10px;
+        }
+
+        .modal-body form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-body form .form-control {
+            margin-bottom: 1rem;
+        }
+
+        .modal-body .btn-back {
+            margin-top: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -99,9 +137,20 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a class="nav-link" href="#">О проекте</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Контакты</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Войти</a></li>
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'profile' %}">{{ user.email }}</a>
+                </li>
+                <li class="nav-item">
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link nav-link" style="padding: 0;">Выйти</button>
+                    </form>
+                </li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="#" id="loginLink">Войти</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" id="signupLink">Регистрация</a></li>
+            {% endif %}
         </ul>
     </div>
 </nav>
@@ -125,6 +174,92 @@
 </div>
 
 <div id="map"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="project-type-modal" id="projectTypeModal">
+        <h5>Выберите тип объекта</h5>
+        <button id="addPointBtn" class="btn btn-success">Добавить точку</button>
+        <button id="addPolygonBtn" class="btn btn-success">Добавить полигон</button>
+        <button id="closeModalBtn" class="btn btn-secondary">Отмена</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="categoryModalOverlay">
+    <div class="category-modal" id="categoryModal">
+        <h5>Выберите категорию</h5>
+        <ul class="list-unstyled">
+            {% for type in types %}
+                <li>
+                    <button class="btn btn-link category-btn" data-category="{{ type.id }}" style="color: {{ type.color }};">{{ type.name }}</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <button id="cancelCategoryBtn" class="btn btn-secondary">Отмена</button>
+    </div>
+</div>
+
+<!-- Модальное окно для выбора действия (вход или регистрация) -->
+<div class="modal fade" id="authChoiceModal" tabindex="-1" aria-labelledby="authChoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="authChoiceModalLabel">Войдите или зарегистрируйтесь</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Чтобы добавить объект, вам необходимо войти в систему или зарегистрироваться.</p>
+                <button id="openLoginModal" class="btn btn-primary btn-block">Войти</button>
+                <button id="openSignupModal" class="btn btn-secondary btn-block">Зарегистрироваться</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для входа -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Войти</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'account_login' %}">
+                    {% csrf_token %}
+                    {{ login_form.as_p }}
+                    <button type="submit" class="btn btn-primary btn-block">Войти</button>
+                </form>
+                <button type="button" class="btn btn-link btn-block" id="backToAuthChoiceFromLogin">Назад</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для регистрации -->
+<div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signupModalLabel">Регистрация</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'account_signup' %}">
+                    {% csrf_token %}
+                    {{ signup_form.as_p }}
+                    <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+                </form>
+                <button type="button" class="btn btn-link btn-block" id="backToAuthChoiceFromSignup">Назад</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
@@ -170,73 +305,86 @@
 
     // Selected object type
     var selectedObjectType = null;
+    var selectedLatLng = null;
 
-    // Add new object button
-    var newObjectBtn = L.control({position: 'bottomright'});
-    newObjectBtn.onAdd = function (map) {
+    // Add new project button
+    var newProjectBtn = L.control({position: 'bottomright'});
+    newProjectBtn.onAdd = function (map) {
         var btnContainer = L.DomUtil.create('div', 'btn-container');
-        var pointBtn = L.DomUtil.create('button', 'btn btn-success', btnContainer);
-        var polygonBtn = L.DomUtil.create('button', 'btn btn-success', btnContainer);
+        var addProjectBtn = L.DomUtil.create('button', 'btn btn-primary', btnContainer);
 
-        pointBtn.textContent = 'Добавить точку';
-        polygonBtn.textContent = 'Добавить полигон';
+        addProjectBtn.textContent = 'Добавить проект';
 
-        pointBtn.onclick = function () {
-            selectedObjectType = 'point';
-            map.on('click', onMapClick);
-        };
-
-        polygonBtn.onclick = function () {
-            selectedObjectType = 'polygon';
-            polygonCoordinates = [];
-            map.on('click', onMapClick);
+        addProjectBtn.onclick = function () {
+            {% if user.is_authenticated %}
+                document.getElementById('modalOverlay').style.display = 'flex';
+            {% else %}
+                $('#authChoiceModal').modal('show'); // Отображение модального окна выбора действия
+            {% endif %}
         };
 
         return btnContainer;
     };
-    newObjectBtn.addTo(map);
+    newProjectBtn.addTo(map);
+
+    document.getElementById('addPointBtn').onclick = function () {
+        selectedObjectType = 'point';
+        document.getElementById('modalOverlay').style.display = 'none';
+        map.once('click', handleMapClick);
+    };
+
+    document.getElementById('addPolygonBtn').onclick = function () {
+        selectedObjectType = 'polygon';
+        polygonCoordinates = [];
+        document.getElementById('modalOverlay').style.display = 'none';
+        map.on('click', handlePolygonClick);
+    };
+
+    document.getElementById('closeModalBtn').onclick = function () {
+        document.getElementById('modalOverlay').style.display = 'none';
+    };
 
     // Store the polygon coordinates
     var polygonCoordinates = [];
 
-    // Handle map click for adding new object
-    function onMapClick(e) {
+    function handleMapClick(e) {
+        selectedLatLng = e.latlng;
         if (selectedObjectType === 'point') {
-            handlePointClick(e);
-        } else if (selectedObjectType === 'polygon') {
-            handlePolygonClick(e);
+            var marker = L.marker(selectedLatLng).addTo(map);
+            document.getElementById('categoryModalOverlay').style.display = 'flex';
         }
-    }
-
-    function handlePointClick(e) {
-        map.off('click', onMapClick);
-        var latlng = e.latlng;
-        var popupContent = getPopupContent(latlng.lat, latlng.lng, null);
-        var popup = L.popup()
-            .setLatLng(latlng)
-            .setContent(popupContent)
-            .openOn(map);
-        setupFormSubmission(popup, latlng.lat, latlng.lng, null);
     }
 
     function handlePolygonClick(e) {
         polygonCoordinates.push([e.latlng.lat, e.latlng.lng]);
         L.polygon(polygonCoordinates).addTo(map);
         if (polygonCoordinates.length >= 3) {
-            var popupContent = getPopupContent(null, null, polygonCoordinates);
-            var popup = L.popup()
-                .setLatLng(e.latlng)
-                .setContent(popupContent)
-                .openOn(map);
-            setupFormSubmission(popup, null, null, polygonCoordinates);
-            map.off('click', onMapClick);
+            document.getElementById('categoryModalOverlay').style.display = 'flex';
+            map.off('click', handlePolygonClick);
         }
     }
 
-    function getPopupContent(lat, lng, polygon) {
+    document.querySelectorAll('.category-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            var selectedCategory = this.dataset.category;
+            document.getElementById('categoryModalOverlay').style.display = 'none';
+            var popupContent = getPopupContent(selectedLatLng.lat, selectedLatLng.lng, selectedCategory, polygonCoordinates);
+            var popup = L.popup()
+                .setLatLng(selectedLatLng)
+                .setContent(popupContent)
+                .openOn(map);
+            setupFormSubmission(popup, selectedLatLng.lat, selectedLatLng.lng, selectedCategory, polygonCoordinates);
+        });
+    });
+
+    document.getElementById('cancelCategoryBtn').onclick = function () {
+        document.getElementById('categoryModalOverlay').style.display = 'none';
+    };
+
+    function getPopupContent(lat, lng, category, polygon) {
         return `
             <form id="newObjectForm">
-                {% csrf_token %}
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
                 <div class="form-group">
                     <label for="objectName">Название</label>
                     <input type="text" class="form-control" id="objectName" required>
@@ -247,11 +395,7 @@
                 </div>
                 <div class="form-group">
                     <label for="objectType">Тип</label>
-                    <select class="form-control" id="objectType" required>
-                        {% for type in types %}
-                        <option value="{{ type.id }}">{{ type.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <input type="text" class="form-control" id="objectType" value="${category}" readonly>
                 </div>
                 <input type="hidden" id="objectLatitude" value="${lat || ''}">
                 <input type="hidden" id="objectLongitude" value="${lng || ''}">
@@ -261,52 +405,93 @@
         `;
     }
 
-function setupFormSubmission(popup, lat, lng, polygon) {
-    var form = popup.getElement().querySelector('form');
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var formData = {
-            name: document.getElementById('objectName').value,
-            description: document.getElementById('objectDescription').value,
-            type: document.getElementById('objectType').value,
-            latitude: lat,
-            longitude: lng,
-            polygon: polygon ? JSON.stringify(polygon) : null
-        };
-        $.ajax({
-            type: 'POST',
-            url: '{% url "add_object" %}',
-            data: formData,
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            success: function () {
-                map.closePopup();
-                // Optionally reload the map or add the marker directly
+    function setupFormSubmission(popup, lat, lng, category, polygon) {
+        var form = popup.getElement().querySelector('form');
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var formData = new FormData();
+            formData.append('name', document.getElementById('objectName').value);
+            formData.append('description', document.getElementById('objectDescription').value);
+            formData.append('type_object', category);
+            formData.append('latitude', lat);
+            formData.append('longitude', lng);
+            if (polygon) {
+                formData.append('polygon', JSON.stringify(polygon));
             }
+            formData.append('csrfmiddlewaretoken', csrftoken);
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "add_object" %}',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.status === 'success') {
+                        map.closePopup();
+                        alert('Объект успешно добавлен!');
+                    } else if (response.status === 'error') {
+                        alert('Ошибка при добавлении объекта: ' + JSON.stringify(response.errors));
+                    } else if (response.status === 'invalid method') {
+                        alert('Неверный метод запроса.');
+                    }
+                },
+                error: function (response) {
+                    if (response.status === 403) {
+                        alert('Вы должны войти в систему, чтобы добавить объект.');
+                    } else {
+                        alert('Ошибка при добавлении объекта: ' + response.statusText);
+                    }
+                }
+            });
         });
-    });
-}
+    }
+
     function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
 
-const csrftoken = getCookie('csrftoken');
-    map.on('click', onMapClick);
+    const csrftoken = getCookie('csrftoken');
 
+    // Обработчики для открытия модальных окон
+    document.getElementById('loginLink').addEventListener('click', function() {
+        $('#loginModal').modal('show');
+    });
+
+    document.getElementById('signupLink').addEventListener('click', function() {
+        $('#signupModal').modal('show');
+    });
+
+    document.getElementById('openLoginModal').addEventListener('click', function() {
+        $('#authChoiceModal').modal('hide');
+        $('#loginModal').modal('show');
+    });
+
+    document.getElementById('openSignupModal').addEventListener('click', function() {
+        $('#authChoiceModal').modal('hide');
+        $('#signupModal').modal('show');
+    });
+
+    document.getElementById('backToAuthChoiceFromLogin').addEventListener('click', function() {
+        $('#loginModal').modal('hide');
+        $('#authChoiceModal').modal('show');
+    });
+
+    document.getElementById('backToAuthChoiceFromSignup').addEventListener('click', function() {
+        $('#signupModal').modal('hide');
+        $('#authChoiceModal').modal('show');
+    });
 </script>
-
 </body>
 </html>
