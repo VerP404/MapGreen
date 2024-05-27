@@ -5,9 +5,12 @@ from django.contrib.auth.models import User
 class TypeObject(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subtypes')
+    color = models.CharField(max_length=7, unique=True)  # Цвет в формате HEX
 
     def __str__(self):
         return self.name
+
 class Object(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()

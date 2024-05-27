@@ -10,7 +10,7 @@ from allauth.account.forms import LoginForm, SignupForm
 
 
 def index(request):
-    objects = Object.objects.filter(is_published=True).values('name', 'description', 'latitude', 'longitude')
+    objects = Object.objects.filter(is_published=True).values('name', 'description', 'latitude', 'longitude', 'type_object__color')
     types = TypeObject.objects.all()
     login_form = LoginForm()
     signup_form = SignupForm()

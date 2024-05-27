@@ -86,9 +86,9 @@
             width: auto;
         }
 
-        .legend span[data-color] {
-            background-color: var(--color);
-        }
+        {#.legend span[data-color] {#}
+        {#    background-color: var(--color);#}
+        {#}#}
 
         .modal-overlay {
             position: fixed;
@@ -126,7 +126,8 @@
 
         .modal-body .btn-back {
             margin-top: 1rem;
-        }
+        }}
+        
     </style>
 </head>
 <body>
@@ -165,9 +166,18 @@
         <h6>Категории</h6>
         <ul class="legend">
             {% for type in types %}
-                <li>
-                    <span style="background-color: {{ type.color }}"></span><a href="#">{{ type.name }}</a>
-                </li>
+                {% if not type.parent %}
+                    <li>
+                        <span style="background-color: {{ type.color }}"></span><a href="#">{{ type.name }}</a>
+                        <ul>
+                            {% for subtype in type.subtypes.all %}
+                                <li>
+                                    <span style="background-color: {{ subtype.color }}"></span><a href="#">{{ subtype.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
     </div>
@@ -189,9 +199,18 @@
         <h5>Выберите категорию</h5>
         <ul class="list-unstyled">
             {% for type in types %}
-                <li>
-                    <button class="btn btn-link category-btn" data-category="{{ type.id }}" style="color: {{ type.color }};">{{ type.name }}</button>
-                </li>
+                {% if not type.parent %}
+                    <li>
+                        <button class="btn btn-link category-btn" data-category="{{ type.id }}" style="color: {{ type.color }};">{{ type.name }}</button>
+                        <ul>
+                            {% for subtype in type.subtypes.all %}
+                                <li>
+                                    <button class="btn btn-link category-btn" data-category="{{ subtype.id }}" style="color: {{ subtype.color }};">{{ subtype.name }}</button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
         <button id="cancelCategoryBtn" class="btn btn-secondary">Отмена</button>
@@ -278,8 +297,15 @@
     // Add objects to map
     var objects = {{ objects|safe }};
     objects.forEach(function (obj) {
-        L.marker([obj.latitude, obj.longitude]).addTo(map)
-            .bindPopup('<b>' + obj.name + '</b><br />' + obj.description);
+        L.circleMarker([obj.latitude, obj.longitude], {
+            radius: 9,
+            fillColor: obj.type_object__color,
+            color: '#003153',
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).addTo(map)
+        .bindPopup('<b>' + obj.name + '</b><br />' + obj.description);
     });
 
     // Toggle sidebar
@@ -306,6 +332,7 @@
     // Selected object type
     var selectedObjectType = null;
     var selectedLatLng = null;
+    var selectedObjectTypeColor = null; // Добавляем переменную для хранения цвета
 
     // Add new project button
     var newProjectBtn = L.control({position: 'bottomright'});
@@ -350,14 +377,24 @@
     function handleMapClick(e) {
         selectedLatLng = e.latlng;
         if (selectedObjectType === 'point') {
-            var marker = L.marker(selectedLatLng).addTo(map);
+            var marker = L.circleMarker(selectedLatLng, {
+                radius: 12,
+                fillColor: selectedObjectTypeColor,
+                color: '#003153',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
             document.getElementById('categoryModalOverlay').style.display = 'flex';
         }
     }
 
     function handlePolygonClick(e) {
         polygonCoordinates.push([e.latlng.lat, e.latlng.lng]);
-        L.polygon(polygonCoordinates).addTo(map);
+        L.polygon(polygonCoordinates, {
+            color: '#003153',
+            weight: 2
+        }).addTo(map);
         if (polygonCoordinates.length >= 3) {
             document.getElementById('categoryModalOverlay').style.display = 'flex';
             map.off('click', handlePolygonClick);
@@ -367,13 +404,23 @@
     document.querySelectorAll('.category-btn').forEach(button => {
         button.addEventListener('click', function () {
             var selectedCategory = this.dataset.category;
+            selectedObjectTypeColor = this.style.color;
             document.getElementById('categoryModalOverlay').style.display = 'none';
-            var popupContent = getPopupContent(selectedLatLng.lat, selectedLatLng.lng, selectedCategory, polygonCoordinates);
-            var popup = L.popup()
-                .setLatLng(selectedLatLng)
-                .setContent(popupContent)
-                .openOn(map);
-            setupFormSubmission(popup, selectedLatLng.lat, selectedLatLng.lng, selectedCategory, polygonCoordinates);
+            if (selectedObjectType === 'point') {
+                var popupContent = getPopupContent(selectedLatLng.lat, selectedLatLng.lng, selectedCategory, null);
+                var popup = L.popup()
+                    .setLatLng(selectedLatLng)
+                    .setContent(popupContent)
+                    .openOn(map);
+                setupFormSubmission(popup, selectedLatLng.lat, selectedLatLng.lng, selectedCategory, null);
+            } else if (selectedObjectType === 'polygon') {
+                var popupContent = getPopupContent(null, null, selectedCategory, polygonCoordinates);
+                var popup = L.popup()
+                    .setLatLng(polygonCoordinates[polygonCoordinates.length - 1])
+                    .setContent(popupContent)
+                    .openOn(map);
+                setupFormSubmission(popup, null, null, selectedCategory, polygonCoordinates);
+            }
         });
     });
 
@@ -493,5 +540,4 @@
         $('#authChoiceModal').modal('show');
     });
 </script>
-</body>
-</html>
+
