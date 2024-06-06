@@ -1,0 +1,24 @@
+<div class="modal-overlay" id="categoryModalOverlay">
+    <div class="category-modal" id="categoryModal">
+        <h5>Выберите категорию</h5>
+        <ul class="list-unstyled">
+            {% for type in types %}
+                {% if not type.parent %}
+                    <li>
+                        <button class="btn btn-link category-btn" data-category="{{ type.id }}"
+                                style="color: {{ type.color }};">{{ type.name }}</button>
+                        <ul>
+                            {% for subtype in type.subtypes.all %}
+                                <li>
+                                    <button class="btn btn-link category-btn" data-category="{{ subtype.id }}"
+                                            style="color: {{ subtype.color }};">{{ subtype.name }}</button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <button id="cancelCategoryBtn" class="btn btn-secondary">Отмена</button>
+    </div>
+</div>

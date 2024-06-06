@@ -1,0 +1,26 @@
+<!-- map_app/templates/map_app/includes/sidebar.html -->
+<div class="sidebar">
+    <input type="text" class="form-control mb-3" placeholder="Начните печатать здесь, чтобы найти проекты">
+    <div>
+        <h6>Качество проектов</h6>
+        <p>Проекты курируются администраторами Зеленой Карты и отображаются только проекты самого высокого качества,
+            содержащие исследовательские данные.</p>
+        <h6>Категории</h6>
+        <ul class="legend">
+            {% for type in types %}
+                {% if not type.parent %}
+                    <li>
+                        <span style="background-color: {{ type.color }}"></span><a href="#">{{ type.name }}</a>
+                        <ul>
+                            {% for subtype in type.subtypes.all %}
+                                <li>
+                                    <span style="background-color: {{ subtype.color }}"></span><a href="#">{{ subtype.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
