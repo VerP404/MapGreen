@@ -1,4 +1,4 @@
-<!-- Модальное окно для регистрации -->
+<!-- map_app/templates/map_app/modal/signup_modal.html -->
 <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -9,9 +9,9 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="{% url 'account_signup' %}">
+                <form id="signupForm" method="post">
                     {% csrf_token %}
-                    {{ signup_form.as_p }}
+                    {{ form.as_p }}
                     <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
                 </form>
                 <button type="button" class="btn btn-link btn-block" id="backToAuthChoiceFromSignup">Назад</button>

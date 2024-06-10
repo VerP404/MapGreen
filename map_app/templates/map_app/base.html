@@ -4,11 +4,12 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Зеленая Карта</title>
+    <title>{% block title %}Зеленая Карта{% endblock %}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <link rel="stylesheet" href="{% static 'map_app/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'map_app/css/sidebar.css' %}">
 </head>
 <body>
 {% include 'map_app/includes/navbar.html' %}
@@ -23,6 +24,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.72.0/L.Control.Locate.min.js"></script>
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.72.0/L.Control.Locate.min.css"/>
+<script src="{% static 'map_app/js/sidebar.js' %}"></script>
 
 <script>
     {% block scripts %}{% endblock %}

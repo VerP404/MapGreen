@@ -6,20 +6,22 @@
         <p>Проекты курируются администраторами Зеленой Карты и отображаются только проекты самого высокого качества,
             содержащие исследовательские данные.</p>
         <h6>Категории</h6>
+        <button class="btn btn-secondary btn-block" id="resetFilters">Сбросить фильтры</button>
         <ul class="legend">
-            {% for type in types %}
-                {% if not type.parent %}
-                    <li>
-                        <span style="background-color: {{ type.color }}"></span><a href="#">{{ type.name }}</a>
-                        <ul>
-                            {% for subtype in type.subtypes.all %}
-                                <li>
-                                    <span style="background-color: {{ subtype.color }}"></span><a href="#">{{ subtype.name }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endif %}
+            {% for category in categories %}
+                <li>
+                    <a href="#" class="category-toggle">
+                        <span style="background-color: {{ category.color }};"></span>{{ category.name }} ({{ category.types.count }})
+                    </a>
+                    <ul class="type-list" style="display: none;">
+                        {% for type in category.types.all %}
+                            <li>
+                                <span style="background-color: {{ type.color }}"></span>
+                                <a href="#" class="type-filter" data-type-id="{{ type.id }}">{{ type.name }} ({{ type.object_set.count }})</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
             {% endfor %}
         </ul>
     </div>

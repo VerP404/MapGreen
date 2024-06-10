@@ -136,4 +136,4 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # отключаем запрос верификации по email
 ACCOUNT_USERNAME_REQUIRED = False
 
-
+AUTH_USER_MODEL = 'map_app.CustomUser'
