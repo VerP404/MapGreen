@@ -12,20 +12,20 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th>Цвет</th>
                         <th>Название</th>
                         <th>Описание</th>
                         <th>Тип</th>
-                        <th>Цвет</th>
                         <th>Дата</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for project in projects %}
                         <tr>
+                            <td><span style="background-color: {{ project.type_object.color }}; width: 20px; height: 20px; display: inline-block;"></span></td>
                             <td>{{ project.name }}</td>
                             <td>{{ project.description }}</td>
                             <td>{{ project.type_object.name }}</td>
-                            <td><span style="background-color: {{ project.type_object.color }}; width: 20px; height: 20px; display: inline-block;"></span></td>
                             <td>{{ project.date_added }}</td>
                         </tr>
                     {% endfor %}
