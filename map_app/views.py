@@ -1,3 +1,4 @@
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -10,7 +11,8 @@ from allauth.account.forms import LoginForm, SignupForm
 
 
 def index(request):
-    objects = Object.objects.filter(is_published=True).values('name', 'description', 'latitude', 'longitude', 'type_object__color', 'type_object_id')
+    objects = Object.objects.filter(is_published=True).values('name', 'description', 'latitude', 'longitude',
+                                                              'type_object__color', 'type_object_id')
     types = TypeObject.objects.all()
     categories = Category.objects.prefetch_related('types').all()
     login_form = LoginForm()
@@ -63,4 +65,41 @@ def add_object(request):
 
 @login_required
 def profile_view(request):
-    return render(request, 'map_app/profile.html')
+    user_projects = Object.objects.filter(user=request.user)
+    project_stats = (
+        user_projects
+        .values('type_object__name')
+        .annotate(total=Count('id'), published=Count('id', filter=Q(is_published=True)))
+        .order_by('type_object__name')
+    )
+    return render(request, 'map_app/profile.html', {
+        'user_projects': user_projects,
+        'project_stats': project_stats,
+    })
+
+
+def project_list_view(request):
+    categories = Category.objects.annotate(
+        total_objects=Count('types__object', filter=Q(types__object__is_published=True))
+    )
+
+    category_types = {}
+    for category in categories:
+        category_types[category.id] = TypeObject.objects.filter(category=category).annotate(
+            published_count=Count('object', filter=Q(object__is_published=True))
+        )
+
+    selected_category = request.GET.get('category')
+    if selected_category:
+        projects = Object.objects.filter(is_published=True, type_object__category__id=selected_category)
+        category = Category.objects.get(id=selected_category)
+    else:
+        projects = Object.objects.filter(is_published=True)
+        category = None
+
+    return render(request, 'map_app/project_list.html', {
+        'categories': categories,
+        'projects': projects,
+        'category': category,
+        'category_types': category_types
+    })

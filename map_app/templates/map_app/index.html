@@ -2,17 +2,17 @@
 
 {% block content %}
 
-<button class="btn btn-primary toggle-sidebar-btn"><</button>
-<div id="map"></div>
-{% include 'map_app/includes/sidebar.html' %}
-<!-- Модальные окна при добавлении объекта -->
-{% include 'map_app/modal/objects/modal_overlay.html' %}
-{% include 'map_app/modal/objects/category_modal_overlay.html' %}
+    <button class="btn btn-primary toggle-sidebar-btn"><</button>
+    <div id="map"></div>
+    {% include 'map_app/includes/sidebar.html' %}
+    <!-- Модальные окна при добавлении объекта -->
+    {% include 'map_app/modal/objects/modal_overlay.html' %}
+    {% include 'map_app/modal/objects/category_modal_overlay.html' %}
 
-<!-- Модальные окна для регистрации и авторизации пользователей -->
-{% include 'map_app/modal/users/auth_choice_modal.html' %}
-{% include 'map_app/modal/users/login_modal.html' %}
-{% include 'map_app/modal/users/signup_modal.html' %}
+    <!-- Модальные окна для регистрации и авторизации пользователей -->
+    {% include 'map_app/modal/users/auth_choice_modal.html' %}
+    {% include 'map_app/modal/users/login_modal.html' %}
+    {% include 'map_app/modal/users/signup_modal.html' %}
 {% endblock %}
 
 {% block scripts %}
@@ -20,28 +20,35 @@
 
     var map = L.map('map').setView([55.755864, 37.617698], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+    // Функция для создания каплевидной иконки
+    function createDropIcon(color) {
+    return L.divIcon({
+    html:`
+    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 0C9.82 0 4 9.92 4 13.92 4 17.74 7.22 21 12 21s8-3.26 8-7.08C20 9.92 14.18 0 12 0z"
+              fill="${color}" stroke="#006400" stroke-width="2"/>
+    </svg>`,
+    className: '',
+    iconSize: [24, 24],
+    iconAnchor: [12, 24]
+    });
+    }
 
-    // Add objects to map
+    // Add objects to map with drop icon
     var objects = {{ objects|safe }};
     objects.forEach(function (obj) {
-        L.circleMarker([obj.latitude, obj.longitude], {
-            radius: 9,
-            fillColor: obj.type_object__color,
-            color: '#003153',
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8
-        }).addTo(map)
-        .bindPopup('<b>' + obj.name + '</b><br />' + obj.description);
+    L.marker([obj.latitude, obj.longitude], {
+    icon: createDropIcon(obj.type_object__color)
+    }).addTo(map)
+    .bindPopup('<b>' + obj.name + '</b><br/>' + obj.description);
     });
-
     // Toggle sidebar
     document.querySelector('.toggle-sidebar-btn').addEventListener('click', function () {
-        var sidebar = document.querySelector('.sidebar');
-        sidebar.classList.toggle('collapsed');
-        this.textContent = sidebar.classList.contains('collapsed') ? '>' : '<';
+    var sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('collapsed');
+    this.textContent = sidebar.classList.contains('collapsed') ? '>' : '<';
     });
 
     // Move zoom controls to the top right
@@ -49,13 +56,13 @@
 
     // Add geolocation control
     L.control.locate({
-        position: 'topright',
-        strings: {
-            title: '<i class="fas fa-location-arrow"></i> Показать мое местоположение'
-        },
-        locateOptions: {
-            enableHighAccuracy: true
-        }
+    position: 'topright',
+    strings: {
+    title: '<i class="fas fa-location-arrow"></i> Показать мое местоположение'
+    },
+    locateOptions: {
+    enableHighAccuracy: true
+    }
     }).addTo(map);
 
     // Selected object type
@@ -66,201 +73,201 @@
     // Add new project button
     var newProjectBtn = L.control({position: 'bottomright'});
     newProjectBtn.onAdd = function (map) {
-        var btnContainer = L.DomUtil.create('div', 'btn-container');
-        var addProjectBtn = L.DomUtil.create('button', 'btn btn-primary', btnContainer);
+    var btnContainer = L.DomUtil.create('div', 'btn-container');
+    var addProjectBtn = L.DomUtil.create('button', 'btn btn-success', btnContainer);
 
-        addProjectBtn.textContent = 'Добавить проект';
+    addProjectBtn.textContent = 'Добавить проект';
 
-        addProjectBtn.onclick = function () {
-            {% if user.is_authenticated %}
-                document.getElementById('modalOverlay').style.display = 'flex';
-            {% else %}
-                $('#authChoiceModal').modal('show'); // Отображение модального окна выбора действия
-            {% endif %}
-        };
+    addProjectBtn.onclick = function () {
+    {% if user.is_authenticated %}
+        document.getElementById('modalOverlay').style.display = 'flex';
+    {% else %}
+        $('#authChoiceModal').modal('show'); // Отображение модального окна выбора действия
+    {% endif %}
+    };
 
-        return btnContainer;
+    return btnContainer;
     };
     newProjectBtn.addTo(map);
 
     document.getElementById('addPointBtn').onclick = function () {
-        selectedObjectType = 'point';
-        document.getElementById('modalOverlay').style.display = 'none';
-        map.once('click', handleMapClick);
+    selectedObjectType = 'point';
+    document.getElementById('modalOverlay').style.display = 'none';
+    map.getContainer().classList.add('crosshair-cursor'); // Добавляем класс для курсора
+
+    map.once('click', function (e) {
+    handleMapClick(e);
+    map.getContainer().classList.remove('crosshair-cursor'); // Убираем класс для курсора
+    });
     };
 
 
     document.getElementById('closeModalBtn').onclick = function () {
-        document.getElementById('modalOverlay').style.display = 'none';
+    document.getElementById('modalOverlay').style.display = 'none';
+    map.getContainer().classList.remove('crosshair-cursor'); // Убираем класс для курсора
     };
 
     // Store the polygon coordinates
     var polygonCoordinates = [];
 
     function handleMapClick(e) {
-        selectedLatLng = e.latlng;
-        if (selectedObjectType === 'point') {
-            var marker = L.circleMarker(selectedLatLng, {
-                radius: 12,
-                fillColor: selectedObjectTypeColor,
-                color: '#003153',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(map);
-            document.getElementById('categoryModalOverlay').style.display = 'flex';
-        }
+    selectedLatLng = e.latlng;
+    if (selectedObjectType === 'point') {
+    var marker = L.marker(selectedLatLng, {
+    icon: createDropIcon(selectedObjectTypeColor)
+    }).addTo(map);
+    document.getElementById('categoryModalOverlay').style.display = 'flex';
+    }
     }
 
     function handlePolygonClick(e) {
-        polygonCoordinates.push([e.latlng.lat, e.latlng.lng]);
-        L.polygon(polygonCoordinates, {
-            color: '#003153',
-            weight: 2
-        }).addTo(map);
-        if (polygonCoordinates.length >= 3) {
-            document.getElementById('categoryModalOverlay').style.display = 'flex';
-            map.off('click', handlePolygonClick);
-        }
+    polygonCoordinates.push([e.latlng.lat, e.latlng.lng]);
+    L.polygon(polygonCoordinates, {
+    color: '#00BF32',
+    weight: 2
+    }).addTo(map);
+    if (polygonCoordinates.length >= 3) {
+    document.getElementById('categoryModalOverlay').style.display = 'flex';
+    map.off('click', handlePolygonClick);
+    }
     }
 
     document.querySelectorAll('.category-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            var selectedCategory = this.dataset.category;
-            selectedObjectTypeColor = this.style.color;
-            document.getElementById('categoryModalOverlay').style.display = 'none';
-            if (selectedObjectType === 'point') {
-                var popupContent = getPopupContent(selectedLatLng.lat, selectedLatLng.lng, selectedCategory, null);
-                var popup = L.popup()
-                    .setLatLng(selectedLatLng)
-                    .setContent(popupContent)
-                    .openOn(map);
-                setupFormSubmission(popup, selectedLatLng.lat, selectedLatLng.lng, selectedCategory, null);
-            } else if (selectedObjectType === 'polygon') {
-                var popupContent = getPopupContent(null, null, selectedCategory, polygonCoordinates);
-                var popup = L.popup()
-                    .setLatLng(polygonCoordinates[polygonCoordinates.length - 1])
-                    .setContent(popupContent)
-                    .openOn(map);
-                setupFormSubmission(popup, null, null, selectedCategory, polygonCoordinates);
-            }
-        });
+    button.addEventListener('click', function () {
+    var selectedCategory = this.dataset.category;
+    selectedObjectTypeColor = this.style.color;
+    document.getElementById('categoryModalOverlay').style.display = 'none';
+    if (selectedObjectType === 'point') {
+    var popupContent = getPopupContent(selectedLatLng.lat, selectedLatLng.lng, selectedCategory, null);
+    var popup = L.popup()
+    .setLatLng(selectedLatLng)
+    .setContent(popupContent)
+    .openOn(map);
+    setupFormSubmission(popup, selectedLatLng.lat, selectedLatLng.lng, selectedCategory, null);
+    } else if (selectedObjectType === 'polygon') {
+    var popupContent = getPopupContent(null, null, selectedCategory, polygonCoordinates);
+    var popup = L.popup()
+    .setLatLng(polygonCoordinates[polygonCoordinates.length - 1])
+    .setContent(popupContent)
+    .openOn(map);
+    setupFormSubmission(popup, null, null, selectedCategory, polygonCoordinates);
+    }
+    });
     });
 
     document.getElementById('cancelCategoryBtn').onclick = function () {
-        document.getElementById('categoryModalOverlay').style.display = 'none';
+    document.getElementById('categoryModalOverlay').style.display = 'none';
     };
 
     function getPopupContent(lat, lng, category, polygon) {
-        return `
-            <form id="newObjectForm">
-                <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
-                <div class="form-group">
-                    <label for="objectName">Название</label>
-                    <input type="text" class="form-control" id="objectName" required>
-                </div>
-                <div class="form-group">
-                    <label for="objectDescription">Описание</label>
-                    <textarea class="form-control" id="objectDescription" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="objectType">Тип</label>
-                    <input type="text" class="form-control" id="objectType" value="${category}" readonly>
-                </div>
-                <input type="hidden" id="objectLatitude" value="${lat || ''}">
-                <input type="hidden" id="objectLongitude" value="${lng || ''}">
-                <input type="hidden" id="objectPolygon" value='${polygon ? JSON.stringify(polygon) : ''}'>
-                <button type="submit" class="btn btn-primary">Сохранить</button>
-            </form>
-        `;
+    return `
+    <form id="newObjectForm">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
+        <div class="form-group">
+            <label for="objectName">Название</label>
+            <input type="text" class="form-control" id="objectName" required>
+        </div>
+        <div class="form-group">
+            <label for="objectDescription">Описание</label>
+            <textarea class="form-control" id="objectDescription" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="objectType">Тип</label>
+            <input type="text" class="form-control" id="objectType" value="${category}" readonly>
+        </div>
+        <input type="hidden" id="objectLatitude" value="${lat || ''}">
+        <input type="hidden" id="objectLongitude" value="${lng || ''}">
+        <input type="hidden" id="objectPolygon" value='${polygon ? JSON.stringify(polygon) : ''}'>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+    `;
     }
 
     function setupFormSubmission(popup, lat, lng, category, polygon) {
-        var form = popup.getElement().querySelector('form');
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            var formData = new FormData();
-            formData.append('name', document.getElementById('objectName').value);
-            formData.append('description', document.getElementById('objectDescription').value);
-            formData.append('type_object', category);
-            formData.append('latitude', lat);
-            formData.append('longitude', lng);
-            if (polygon) {
-                formData.append('polygon', JSON.stringify(polygon));
-            }
-            formData.append('csrfmiddlewaretoken', csrftoken);
+    var form = popup.getElement().querySelector('form');
+    form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var formData = new FormData();
+    formData.append('name', document.getElementById('objectName').value);
+    formData.append('description', document.getElementById('objectDescription').value);
+    formData.append('type_object', category);
+    formData.append('latitude', lat);
+    formData.append('longitude', lng);
+    formData.append('csrfmiddlewaretoken', csrftoken);
 
-            $.ajax({
-                type: 'POST',
-                url: '{% url "add_object" %}',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    if (response.status === 'success') {
-                        map.closePopup();
-                        alert('Объект успешно добавлен!');
-                    } else if (response.status === 'error') {
-                        alert('Ошибка при добавлении объекта: ' + JSON.stringify(response.errors));
-                    } else if (response.status === 'invalid method') {
-                        alert('Неверный метод запроса.');
-                    }
-                },
-                error: function (response) {
-                    if (response.status === 403) {
-                        alert('Вы должны войти в систему, чтобы добавить объект.');
-                    } else {
-                        alert('Ошибка при добавлении объекта: ' + response.statusText);
-                    }
-                }
-            });
-        });
+    $.ajax({
+    type: 'POST',
+    url: '{% url "add_object" %}',
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+    if (response.status === 'success') {
+    map.closePopup();
+    alert('Объект успешно добавлен!');
+    location.reload(); // Перезагрузка страницы после успешного добавления объекта
+    } else if (response.status === 'error') {
+    alert('Ошибка при добавлении объекта: ' + JSON.stringify(response.errors));
+    } else if (response.status === 'invalid method') {
+    alert('Неверный метод запроса.');
+    }
+    },
+    error: function (response) {
+    if (response.status === 403) {
+    alert('Вы должны войти в систему, чтобы добавить объект.');
+    } else {
+    alert('Ошибка при добавлении объекта: ' + response.statusText);
+    }
+    }
+    });
+    });
     }
 
+
     function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+    break;
+    }
+    }
+    }
+    return cookieValue;
     }
 
     const csrftoken = getCookie('csrftoken');
 
     // Обработчики для открытия модальных окон
     document.getElementById('loginLink').addEventListener('click', function() {
-        $('#loginModal').modal('show');
+    $('#loginModal').modal('show');
     });
 
     document.getElementById('signupLink').addEventListener('click', function() {
-        $('#signupModal').modal('show');
+    $('#signupModal').modal('show');
     });
 
     document.getElementById('openLoginModal').addEventListener('click', function() {
-        $('#authChoiceModal').modal('hide');
-        $('#loginModal').modal('show');
+    $('#authChoiceModal').modal('hide');
+    $('#loginModal').modal('show');
     });
 
     document.getElementById('openSignupModal').addEventListener('click', function() {
-        $('#authChoiceModal').modal('hide');
-        $('#signupModal').modal('show');
+    $('#authChoiceModal').modal('hide');
+    $('#signupModal').modal('show');
     });
 
     document.getElementById('backToAuthChoiceFromLogin').addEventListener('click', function() {
-        $('#loginModal').modal('hide');
-        $('#authChoiceModal').modal('show');
+    $('#loginModal').modal('hide');
+    $('#authChoiceModal').modal('show');
     });
 
     document.getElementById('backToAuthChoiceFromSignup').addEventListener('click', function() {
-        $('#signupModal').modal('hide');
-        $('#authChoiceModal').modal('show');
+    $('#signupModal').modal('hide');
+    $('#authChoiceModal').modal('show');
     });
 
 {% endblock %}

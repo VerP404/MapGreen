@@ -1,6 +1,10 @@
+from datetime import datetime
+
+import pytz
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils import timezone
 
 
 class Category(models.Model):
@@ -33,6 +37,7 @@ class Object(models.Model):
     photos = models.ImageField(upload_to='photos/', blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
+    # date_created  = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
         if not self.id:  # Only set is_published on new objects

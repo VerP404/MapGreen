@@ -1,10 +1,56 @@
 {% extends "map_app/base.html" %}
 
-
 {% block content %}
 <div class="container mt-5">
     <h1>Личный кабинет</h1>
     <p>Email: {{ user.email }}</p>
-</div>
+    <p>Имя: {{ user.first_name }}</p>
+    <p>Фамилия: {{ user.last_name }}</p>
+    <p>Телефон: {{ user.phone }}</p>
+    <p>Профессия: {{ user.profession }}</p>
+    <p>Место работы: {{ user.workplace }}</p>
+    <p>Должность: {{ user.position }}</p>
 
+    <h2>Мои проекты</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Тип</th>
+                <th>Опубликован</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in user_projects %}
+                <tr>
+                    <td>{{ project.name }}</td>
+                    <td>{{ project.description }}</td>
+                    <td>{{ project.type_object.name }}</td>
+                    <td>{{ project.is_published|yesno:"Да,Нет" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Статистика по проектам</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Тип</th>
+                <th>Всего добавлено</th>
+                <th>Опубликовано</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in project_stats %}
+                <tr>
+                    <td>{{ stat.type_object__name }}</td>
+                    <td>{{ stat.total }}</td>
+                    <td>{{ stat.published }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

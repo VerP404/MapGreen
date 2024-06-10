@@ -1,0 +1,58 @@
+{% extends "map_app/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Проекты</h1>
+            {% if category %}
+                <h2>{{ category.name }}</h2>
+                <p>{{ category.description }}</p>
+            {% endif %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Тип</th>
+                        <th>Цвет</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                        <tr>
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.description }}</td>
+                            <td>{{ project.type_object.name }}</td>
+                            <td><span style="background-color: {{ project.type_object.color }}; width: 20px; height: 20px; display: inline-block;"></span></td>
+                            <td>{{ project.date_added }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <h2>Категории</h2>
+            <ul class="list-group">
+                {% for category in categories %}
+                    <li class="list-group-item">
+                        <a href="?category={{ category.id }}">
+                            <span style="background-color: {{ category.color }};"></span>
+                            {{ category.name }} ({{ category.total_objects }})
+                        </a>
+                        <ul class="type-list" style="display: none;">
+                            {% for type in category_types.category.id %}
+                                <li>
+                                    <span style="background-color: {{ type.color }}"></span>
+                                    <a href="#" class="type-filter" data-type-id="{{ type.id }}">{{ type.name }} ({{ type.published_count }})</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
