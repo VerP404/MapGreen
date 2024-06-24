@@ -11,7 +11,6 @@ DATABASES = db_settings.PRODUCT_DATABASES
 
 # Настройки суперпользователя
 SUPERUSER_DETAILS = {
-    'username': 'admin',
     'email': 'admin@example.com',
     'password': 'Qaz123',
 }
@@ -40,7 +39,7 @@ def create_database_and_user():
                 ),
                 [DATABASES['default']['PASSWORD']]
             )
-            print(f"Пользователь {DATABASES['default']['USER']} успешно создана")
+            print(f"Пользователь {DATABASES['default']['USER']} успешно создан")
         except psycopg2.errors.DuplicateObject:
             print(f"Пользователь {DATABASES['default']['USER']} уже существует")
 
@@ -72,15 +71,14 @@ def create_superuser():
 
     User = get_user_model()
 
-    if not User.objects.filter(username=SUPERUSER_DETAILS['username']).exists():
+    if not User.objects.filter(email=SUPERUSER_DETAILS['email']).exists():
         User.objects.create_superuser(
-            username=SUPERUSER_DETAILS['username'],
             email=SUPERUSER_DETAILS['email'],
             password=SUPERUSER_DETAILS['password']
         )
-        print(f"Суперпользователь {SUPERUSER_DETAILS['username']} успешно создан")
+        print(f"Суперпользователь {SUPERUSER_DETAILS['email']} успешно создан")
     else:
-        print(f"Суперпользователь {SUPERUSER_DETAILS['username']} уже существует")
+        print(f"Суперпользователь {SUPERUSER_DETAILS['email']} уже существует")
 
 
 if __name__ == '__main__':

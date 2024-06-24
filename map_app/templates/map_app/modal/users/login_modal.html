@@ -1,20 +1,32 @@
-<!-- Модальное окно для входа -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="loginModalLabel">Войти</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="post" action="{% url 'account_login' %}">
+<!-- login_modal.html -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="login-form-container">
+            <div class="login-form">
+                <h5>Войти</h5>
+                <div id="loginError" class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
+                <div id="loginSuccess" class="success-message" style="display: none; color: green; margin-bottom: 10px;"></div>
+                <form id="loginForm" method="post" action="{% url 'account_login' %}">
                     {% csrf_token %}
-                    {{ login_form.as_p }}
-                    <button type="submit" class="btn btn-primary btn-block">Войти</button>
+                    <div class="form-group">
+                        <label for="id_login">Адрес электронной почты:</label>
+                        <input type="text" name="login" autofocus autocapitalize="none" autocomplete="username" maxlength="254" class="form-control" required id="id_login">
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password">Пароль:</label>
+                        <input type="password" name="password" autocomplete="current-password" class="form-control" required id="id_password">
+                    </div>
+                    <a href="{% url 'account_reset_password' %}" class="forgot-password">Забыли свой пароль?</a>
+                    <div class="form-group remember-me">
+                        <input type="checkbox" name="remember" id="id_remember">
+                        <label for="id_remember">Запомнить меня</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Войти</button>
                 </form>
-                <button type="button" class="btn btn-link btn-block" id="backToAuthChoiceFromLogin">Назад</button>
+            </div>
+            <div class="login-info">
+                <p>текст</p>
             </div>
         </div>
     </div>

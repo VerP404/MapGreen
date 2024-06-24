@@ -1,20 +1,59 @@
-<!-- map_app/templates/map_app/modal/signup_modal.html -->
-<div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="signupModalLabel">Регистрация</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="signupForm" method="post">
+<div id="signupModal" class="modal">
+    <div class="modal-content signup-modal">
+        <span class="close">&times;</span>
+        <div class="signup-form-container">
+            <div class="signup-form">
+                <h5>Регистрация</h5>
+                <div id="signupError" class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
+                <div id="signupSuccess" class="success-message" style="display: none; color: green; margin-bottom: 10px;"></div>
+                <form id="signupForm" method="post" action="{% url 'register' %}">
                     {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+                    <div class="form-group-container">
+                        <div class="left-form-group">
+                            <div class="form-group">
+                                <label for="id_first_name">Имя</label>
+                                <input type="text" name="first_name" maxlength="30" required id="id_first_name">
+                            </div>
+                            <div class="form-group">
+                                <label for="id_last_name">Фамилия</label>
+                                <input type="text" name="last_name" maxlength="30" required id="id_last_name">
+                            </div>
+                            <div class="form-group">
+                                <label for="id_phone">Телефон</label>
+                                <input type="text" name="phone" maxlength="15" id="id_phone">
+                            </div>
+                        </div>
+                        <div class="right-form-group">
+                            <div class="form-group">
+                                <label for="id_profession">Профессия</label>
+                                <input type="text" name="profession" maxlength="50" id="id_profession">
+                            </div>
+                            <div class="form-group">
+                                <label for="id_workplace">Место работы</label>
+                                <input type="text" name="workplace" maxlength="100" id="id_workplace">
+                            </div>
+                            <div class="form-group">
+                                <label for="id_position">Должность</label>
+                                <input type="text" name="position" maxlength="50" id="id_position">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottom-form-group">
+                        <div class="form-group">
+                            <label for="id_email">Электронная почта</label>
+                            <input type="email" name="email" required id="id_email">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_password1">Пароль</label>
+                            <input type="password" name="password1" required id="id_password1">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_password2">Подтверждение пароля</label>
+                            <input type="password" name="password2" required id="id_password2">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                    </div>
                 </form>
-                <button type="button" class="btn btn-link btn-block" id="backToAuthChoiceFromSignup">Назад</button>
             </div>
         </div>
     </div>

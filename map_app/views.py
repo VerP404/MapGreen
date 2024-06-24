@@ -3,11 +3,16 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate
 from allauth.account.views import SignupView, LoginView
 from .models import Category, Object, TypeObject
-from .forms import ObjectForm, CustomUserCreationForm
+from .forms import ObjectForm, CustomUserCreationForm, CustomSignupForm
 from allauth.account.forms import LoginForm, SignupForm
+from django.contrib.auth import login as auth_login
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+import logging
 
 
 def index(request):
@@ -15,32 +20,57 @@ def index(request):
                                                               'type_object__color', 'type_object_id')
     types = TypeObject.objects.all()
     categories = Category.objects.prefetch_related('types').all()
-    login_form = LoginForm()
-    signup_form = SignupForm()
     form = CustomUserCreationForm()
     return render(request, 'map_app/index.html', {
         'objects': list(objects),
         'types': types,
         'categories': categories,
-        'login_form': login_form,
-        'signup_form': signup_form,
         'form': form
     })
 
 
 def register(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
-            login(request, user)
-            return JsonResponse({'success': True})
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'email': user.email})
+            else:
+                return redirect('index')  # Redirect to the main page or another page after successful registration
         else:
-            return JsonResponse({'success': False, 'errors': form.errors})
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = CustomUserCreationForm()
     return render(request, 'map_app/registration/register.html', {'form': form})
+
+
+# Настройка логгера
+logger = logging.getLogger(__name__)
+
+
+class CustomLoginView(LoginView):
+    @method_decorator(ensure_csrf_cookie)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        auth_login(self.request, form.get_user(), backend='django.contrib.auth.backends.ModelBackend')
+        response_data = {'success': True, 'redirect_url': '/'}
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            logger.debug(f"Response data (valid form): {response_data}")
+            return JsonResponse(response_data)
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        errors = form.errors.as_json()
+        response_data = {'success': False, 'errors': errors}
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            logger.debug(f"Response data (invalid form): {response_data}")
+            return JsonResponse(response_data)
+        return super().form_invalid(form)
 
 
 @csrf_exempt
@@ -54,13 +84,14 @@ def add_object(request):
             if 'latitude' in request.POST and request.POST['latitude']:
                 new_object.latitude = request.POST['latitude']
                 new_object.longitude = request.POST['longitude']
-            if 'polygon' in request.POST and request.POST['polygon']:
-                new_object.polygon = request.POST['polygon']
             new_object.save()
             return JsonResponse({'status': 'success'})
         else:
             return JsonResponse({'status': 'error', 'errors': form.errors})
-    return JsonResponse({'status': 'invalid method'}, status=405)
+    else:
+        form = ObjectForm()
+        types = TypeObject.objects.select_related('parent').all()
+    return render(request, 'map_app/modal/objects/add_object.html', {'form': form, 'types': types})
 
 
 @login_required
@@ -97,9 +128,32 @@ def project_list_view(request):
         projects = Object.objects.filter(is_published=True)
         category = None
 
+    login_form = LoginForm()
+    signup_form = SignupForm()
+    form = CustomUserCreationForm()
+
     return render(request, 'map_app/project_list.html', {
         'categories': categories,
         'projects': projects,
         'category': category,
-        'category_types': category_types
+        'category_types': category_types,
+        'login_form': login_form,
+        'signup_form': signup_form,
+        'form': form
     })
+
+
+def category_list(request):
+    categories = Category.objects.prefetch_related('types').all()
+    return render(request, 'map_app/includes/sidebar.html', {'categories': categories})
+
+
+def get_type_objects_by_category(request, category_id):
+    type_objects = TypeObject.objects.filter(category_id=category_id).values('id', 'name')
+    return JsonResponse({'type_objects': list(type_objects)})
+
+
+def get_published_objects(request):
+    objects = Object.objects.filter(is_published=True).values('name', 'description', 'latitude', 'longitude',
+                                                              'type_object__color')
+    return JsonResponse({'objects': list(objects)})
