@@ -1,11 +1,15 @@
 # admin.py
 from django.contrib import admin
-from .models import TypeObject, Category, Object, CustomUser
+from .models import TypeObject, Category, Object, CustomUser, Photo
 from django.contrib.auth.admin import UserAdmin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from django.utils.translation import gettext_lazy as _
 from .forms import CategoryForm
+
+class PhotoInline(admin.TabularInline):
+    model = Photo
+    extra = 1
 
 class TypeObjectInline(admin.TabularInline):
     model = TypeObject
@@ -70,6 +74,7 @@ class ObjectAdmin(ImportExportModelAdmin):
     list_display = ('name', 'description', 'latitude', 'longitude', 'type_object', 'user', 'is_published')
     list_filter = ('type_object', 'user', 'is_published')
     search_fields = ('name', 'description', 'type_object__name', 'user__email')
+    inlines = [PhotoInline]
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(TypeObject, TypeObjectAdmin)

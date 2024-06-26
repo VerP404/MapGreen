@@ -1,4 +1,5 @@
 /* static/css/object.css */
+
 /* Кнопка для добавления объекта */
 .add-object-btn {
     position: absolute;
@@ -61,6 +62,7 @@
 .confirm-btn:hover, .cancel-btn:hover {
     background-color: #45a049;
 }
+
 .message {
     display: none;
     position: fixed;
@@ -76,4 +78,152 @@
 
 #confirmSelectionMessage .btn {
     margin: 5px;
+}
+
+/* Стили для предварительного просмотра изображений */
+.photos-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.photo-container {
+    position: relative;
+}
+
+.preview-image {
+    max-width: 100px;
+    max-height: 100px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.photo-container label {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 3px 5px;
+    border-radius: 3px;
+}
+
+/* Дополнительные стили для загрузки фотографий */
+.image-input {
+    position: relative;
+    display: inline-block;
+    margin: 10px;
+    width: 100px;
+    height: 100px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.image-input input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.image-input img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-input .delete-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.image-input .delete-icon:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+    width: calc(100% - 22px);
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button.btn.btn-primary {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button.btn.btn-primary:hover {
+    background-color: #218838;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    position: relative;
+}
+
+.modal-content.top-modal {
+    margin: 2% auto; /* Adjust the top margin to position it higher */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
 }

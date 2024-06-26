@@ -1,0 +1,223 @@
+/* project_list.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.project-container {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 20px 20px 20px 20px;
+}
+
+.view-switch {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px; /* Уменьшено */
+    align-items: center;
+}
+
+.view-input {
+    display: none;
+}
+
+.view-label {
+    padding: 5px 10px; /* Уменьшено */
+    margin-left: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f4f4f4;
+    transition: background-color 0.3s;
+}
+
+.view-label i {
+    margin-right: 3px; /* Уменьшено */
+}
+
+.view-input:checked + .view-label {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.projects-header h2 {
+    font-size: 24px;
+    margin-bottom: 5px; /* Уменьшено */
+}
+
+.projects-header p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px; /* Уменьшено */
+}
+
+.projects-content {
+    display: flex;
+}
+
+.left-panel {
+    width: 20%;
+    margin-right: 10px; /* Уменьшено */
+}
+
+.right-panel {
+    width: 80%;
+}
+
+.categories {
+    list-style-type: none;
+    padding: 0;
+}
+
+.categories li {
+    padding: 5px; /* Уменьшено */
+    margin-bottom: 3px; /* Уменьшено */
+    border-radius: 5px;
+}
+
+.categories li a {
+    text-decoration: none;
+    color: #000;
+}
+
+.categories li a:hover {
+    text-decoration: underline;
+}
+
+.categories li .color {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px; /* Уменьшено */
+    border-radius: 50%;
+}
+
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Уменьшено */
+}
+
+.project-item {
+    display: flex;
+    align-items: center;
+    padding: 5px; /* Уменьшено */
+    background-color: #fff;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.project-icon {
+    margin-right: 10px; /* Уменьшено */
+}
+
+.project-icon i {
+    font-size: 24px;
+    color: #007bff;
+}
+
+.project-details {
+    flex: 1;
+}
+
+.project-date {
+    white-space: nowrap;
+}
+
+.project-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Уменьшено */
+}
+
+.project-card {
+    width: calc(25% - 10px); /* Уменьшено */
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.project-image {
+    max-width: 100%;
+    border-radius: 5px;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 1200px) {
+    .project-card {
+        width: calc(33.333% - 10px); /* Уменьшено */
+    }
+}
+
+@media (max-width: 992px) {
+    .project-card {
+        width: calc(50% - 10px); /* Уменьшено */
+    }
+    .project-container {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 70px 20px 20px 20px;
+}
+}
+
+@media (max-width: 768px) {
+    .projects-content {
+        flex-direction: column;
+    }
+
+    .left-panel {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px; /* Уменьшено */
+    }
+
+    .right-panel {
+        width: 100%;
+    }
+
+    .project-card {
+        width: 100%;
+    }
+
+    .project-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px; /* Уменьшено */
+    }
+
+    .project-details {
+        margin-top: 5px; /* Уменьшено */
+    }
+
+    .project-container {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 70px 20px 20px 20px;
+}
+}
+
+@media (max-width: 576px) {
+    .project-container {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 70px 20px 20px 20px;
+}
+
+    .view-label {
+        padding: 5px 5px; /* Уменьшено */
+        margin-left: 5px;
+    }
+}

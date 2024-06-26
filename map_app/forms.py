@@ -1,6 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import Object, CustomUser, Category, TypeObject
+from .models import Object, CustomUser, Category, TypeObject, Photo
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -10,11 +10,10 @@ class ObjectForm(forms.ModelForm):
 
     class Meta:
         model = Object
-        fields = ['name', 'description', 'latitude', 'longitude', 'polygon', 'category', 'type_object', 'photos']
+        fields = ['name', 'description', 'latitude', 'longitude', 'category', 'type_object']
         widgets = {
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
-            'polygon': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -27,6 +26,20 @@ class ObjectForm(forms.ModelForm):
                 self.fields['type_object'].queryset = TypeObject.objects.none()
         elif self.instance.pk:
             self.fields['type_object'].queryset = self.instance.category.typeobject_set.order_by('name')
+
+
+class PhotoForm(forms.ModelForm):
+    is_main = forms.BooleanField(required=False, label='Главное фото')
+
+    class Meta:
+        model = Photo
+        fields = ['image', 'description', 'is_main']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 2}),
+        }
+
+PhotoFormSet = forms.inlineformset_factory(Object, Photo, form=PhotoForm, extra=3)
+
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
@@ -87,6 +100,7 @@ ICON_CHOICES = [
     ('ri-tree-line', 'ri-tree-line'),
     ('ri-palm-tree-line', 'ri-palm-tree-line'),
 ]
+
 
 class CategoryForm(forms.ModelForm):
     icon = forms.ChoiceField(choices=ICON_CHOICES, widget=forms.Select(attrs={'onchange': 'updateIconPreview()'}))

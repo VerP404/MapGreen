@@ -7,8 +7,8 @@
     </div>
     <div class="sidebar-layout">
         <div class="sidebar-header">
-            <div class="pro-sidebar-logo">
-                <div>P</div>
+            <div class="pro-sidebar-logo" >
+                <img src="{% static 'map_app/img/logo.png' %}" alt="Logo" class="logo">
                 <h5>Зеленая карта</h5>
             </div>
         </div>
@@ -19,38 +19,37 @@
                     {% if user.is_authenticated %}
                         <li class="menu-item">
                             <a href="{% url 'profile' %}">
-                            <span class="menu-icon">
-                                <i class="ri-user-line"></i>
-                            </span>
+                                <span class="menu-icon">
+                                    <i class="ri-user-line"></i>
+                                </span>
                                 <span class="menu-title">{{ user.email }}</span>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="#" onclick="document.getElementById('logout-form').submit();">
-                            <span class="menu-icon">
-                                <i class="ri-logout-box-line"></i>
-                            </span>
+                                <span class="menu-icon">
+                                    <i class="ri-logout-box-line"></i>
+                                </span>
                                 <span class="menu-title">Выйти</span>
                             </a>
-                            <form id="logout-form" method="post" action="{% url 'account_logout' %}"
-                                  style="display: none;">
+                            <form id="logout-form" method="post" action="{% url 'account_logout' %}" style="display: none;">
                                 {% csrf_token %}
                             </form>
                         </li>
                     {% else %}
                         <li class="menu-item">
                             <a href="#" id="openLoginModal">
-                            <span class="menu-icon">
-                                <i class="ri-login-box-line"></i>
-                            </span>
+                                <span class="menu-icon">
+                                    <i class="ri-login-box-line"></i>
+                                </span>
                                 <span class="menu-title">Войти</span>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="#" id="openSignupModal">
-                            <span class="menu-icon">
-                                <i class="ri-user-add-line"></i>
-                            </span>
+                                <span class="menu-icon">
+                                    <i class="ri-user-add-line"></i>
+                                </span>
                                 <span class="menu-title">Зарегистрироваться</span>
                             </a>
                         </li>
@@ -83,22 +82,30 @@
                 </ul>
                 <ul>
                     <li class="menu-header"><span>Фильтр по проектам</span></li>
+                    <li class="menu-item">
+                        <a href="#" id="resetFiltersBtn">
+                            <span class="menu-icon">
+                                <i class="ri-close-line"></i>
+                            </span>
+                            <span class="menu-title">Сбросить фильтры</span>
+                        </a>
+                    </li>
                     {% for category in categories %}
                         <li class="menu-item sub-menu">
-                            <a href="#">
+                            <a href="#" class="category-filter" data-category-id="{{ category.id }}">
                                 <span class="menu-icon">
                                     <i class="{{ category.icon }}" style="color: {{ category.color }}"></i>
                                 </span>
                                 <span class="menu-title">{{ category.name }}</span>
                                 <span class="menu-suffix">
-                                    <span class="badge primary">Все</span>
+                                    <span class="badge primary">info</span>
                                 </span>
                             </a>
                             <div class="sub-menu-list">
                                 <ul>
                                     {% for type in category.types.all %}
                                         <li class="menu-item">
-                                            <a href="#">
+                                            <a href="#" class="type-filter" data-type-id="{{ type.id }}">
                                                 <span class="menu-icon">
                                                     <i class="{{ category.icon }}" style="color: {{ type.color }}"></i>
                                                 </span>

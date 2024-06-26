@@ -1,4 +1,3 @@
-// static/js/object.js
 document.addEventListener('DOMContentLoaded', function () {
     const addObjectBtn = document.getElementById('addObjectBtn');
     const objectFormModal = document.getElementById('objectFormModal');
@@ -22,28 +21,65 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.style.display = 'none';
     }
 
-    addObjectBtn.addEventListener('click', function () {
-        selectPointMessage.style.display = 'block';
-        document.getElementById('map').style.cursor = 'crosshair';
-    });
+    function loadImage(event, id) {
+        const input = event.target;
+        const reader = new FileReader();
+        reader.onload = function () {
+            const imageContainer = document.getElementById(id);
+            const imgElement = document.createElement('img');
+            imgElement.src = reader.result;
+            imgElement.style.width = '100%';
+            imgElement.style.height = '100%';
+            imgElement.style.objectFit = 'cover';
+            imageContainer.innerHTML = '';
+            imageContainer.appendChild(imgElement);
+            const deleteIcon = document.createElement('span');
+            deleteIcon.className = 'delete-icon';
+            deleteIcon.innerHTML = '&times;';
+            deleteIcon.onclick = function () {
+                removeImage(id);
+            };
+            imageContainer.appendChild(deleteIcon);
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
 
-    closeFormModalBtn.addEventListener('click', function () {
-        hideModal(objectFormModal);
-    });
+    function removeImage(id) {
+        const imageContainer = document.getElementById(id);
+        imageContainer.innerHTML = '<input type="file" accept="image/*" onchange="loadImage(event, \'' + id + '\')">' +
+                                   '<span class="delete-icon" onclick="removeImage(\'' + id + '\')">&times;</span>';
+    }
 
-    confirmBtn.addEventListener('click', function () {
-        confirmSelectionMessage.style.display = 'none';
-        showModal(objectFormModal);
-    });
+    if (addObjectBtn) {
+        addObjectBtn.addEventListener('click', function () {
+            selectPointMessage.style.display = 'block';
+            document.getElementById('map').style.cursor = 'crosshair';
+        });
+    }
 
-    cancelBtn.addEventListener('click', function () {
-        confirmSelectionMessage.style.display = 'none';
-        if (marker) {
-            map.removeLayer(marker);
-            marker = null;
-        }
-        document.getElementById('map').style.cursor = '';
-    });
+    if (closeFormModalBtn) {
+        closeFormModalBtn.addEventListener('click', function () {
+            hideModal(objectFormModal);
+        });
+    }
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function () {
+            confirmSelectionMessage.style.display = 'none';
+            showModal(objectFormModal);
+        });
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+            confirmSelectionMessage.style.display = 'none';
+            if (marker) {
+                map.removeLayer(marker);
+                marker = null;
+            }
+            document.getElementById('map').style.cursor = '';
+        });
+    }
 
     const map = window.myMap;
     const createDropIcon = window.createDropIcon;
@@ -57,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 map.removeLayer(marker);
             }
 
-            marker = L.marker([lat, lng], { icon: createDropIcon('#FF0000') }).addTo(map);
+            marker = L.marker([lat, lng], {icon: createDropIcon('#FF0000')}).addTo(map);
 
             latitudeInput.value = lat;
             longitudeInput.value = lng;
@@ -86,7 +122,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Обработка отправки формы
     document.getElementById('objectForm').addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -95,19 +130,22 @@ document.addEventListener('DOMContentLoaded', function () {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                hideModal(objectFormModal);
-                successMessage.style.display = 'block';
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 3000);
-            } else {
-                // Обработка ошибок
-                console.log(data.errors);
-            }
-        })
-        .catch(error => console.error('Ошибка:', error));
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    hideModal(objectFormModal);
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                } else {
+                    console.log(data.errors);
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
     });
 });
+
+// Attach the loadImage function to window so it can be called from inline event handlers
+window.loadImage = loadImage;
+window.removeImage = removeImage;

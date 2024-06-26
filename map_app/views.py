@@ -5,8 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from allauth.account.views import SignupView, LoginView
-from .models import Category, Object, TypeObject
-from .forms import ObjectForm, CustomUserCreationForm, CustomSignupForm
+from .models import Category, Object, TypeObject, Photo
+from .forms import ObjectForm, CustomUserCreationForm, CustomSignupForm, PhotoFormSet
 from allauth.account.forms import LoginForm, SignupForm
 from django.contrib.auth import login as auth_login
 from django.utils.decorators import method_decorator
@@ -77,7 +77,7 @@ class CustomLoginView(LoginView):
 @login_required
 def add_object(request):
     if request.method == 'POST':
-        form = ObjectForm(request.POST, request.FILES)
+        form = ObjectForm(request.POST)
         if form.is_valid():
             new_object = form.save(commit=False)
             new_object.user = request.user
@@ -85,15 +85,22 @@ def add_object(request):
                 new_object.latitude = request.POST['latitude']
                 new_object.longitude = request.POST['longitude']
             new_object.save()
+
+            main_photo_index = int(request.POST.get('main_photo_index', 0))
+            photos = request.FILES.getlist('photos')
+
+            for index, photo in enumerate(photos):
+                Photo.objects.create(
+                    object=new_object,
+                    image=photo,
+                    is_main=(index == main_photo_index)
+                )
             return JsonResponse({'status': 'success'})
         else:
             return JsonResponse({'status': 'error', 'errors': form.errors})
     else:
         form = ObjectForm()
-        types = TypeObject.objects.select_related('parent').all()
-    return render(request, 'map_app/modal/objects/add_object.html', {'form': form, 'types': types})
-
-
+    return render(request, 'map_app/modal/objects/add_object.html', {'form': form, 'categories': Category.objects.all()})
 @login_required
 def profile_view(request):
     user_projects = Object.objects.filter(user=request.user)
@@ -120,10 +127,11 @@ def project_list_view(request):
             published_count=Count('object', filter=Q(object__is_published=True))
         )
 
-    selected_category = request.GET.get('category')
-    if selected_category:
-        projects = Object.objects.filter(is_published=True, type_object__category__id=selected_category)
-        category = Category.objects.get(id=selected_category)
+    selected_category_id = request.GET.get('category')
+    view_mode = request.GET.get('view_mode', 'grid')
+    if selected_category_id:
+        projects = Object.objects.filter(is_published=True, type_object__category__id=selected_category_id)
+        category = Category.objects.get(id=selected_category_id)
     else:
         projects = Object.objects.filter(is_published=True)
         category = None
@@ -137,6 +145,7 @@ def project_list_view(request):
         'projects': projects,
         'category': category,
         'category_types': category_types,
+        'view_mode': view_mode,
         'login_form': login_form,
         'signup_form': signup_form,
         'form': form
@@ -154,6 +163,16 @@ def get_type_objects_by_category(request, category_id):
 
 
 def get_published_objects(request):
-    objects = Object.objects.filter(is_published=True).values('name', 'description', 'latitude', 'longitude',
-                                                              'type_object__color')
+    category_id = request.GET.get('category')
+    type_id = request.GET.get('type')
+
+    filters = {'is_published': True}
+
+    if category_id:
+        filters['type_object__category_id'] = category_id
+
+    if type_id:
+        filters['type_object_id'] = type_id
+
+    objects = Object.objects.filter(**filters).values('name', 'description', 'latitude', 'longitude', 'type_object__color')
     return JsonResponse({'objects': list(objects)})

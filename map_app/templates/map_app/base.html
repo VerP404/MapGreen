@@ -5,13 +5,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Responsive layout with advanced sidebar menu built with SCSS and vanilla Javascript">
+    <meta name="description"
+          content="Responsive layout with advanced sidebar menu built with SCSS and vanilla Javascript">
     <link rel="shortcut icon" type="image/png" href="{% static 'map_app/img/favicon.png' %}">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
     <link rel="stylesheet" href="{% static 'map_app/css/main.css' %}">
     <link rel="stylesheet" href="{% static 'map_app/css/object.css' %}">
+    <link rel="stylesheet" href="{% static 'map_app/css/project_list.css' %}">
     <title>{% block title %}Зеленая карта{% endblock %}</title>
 </head>
 <body>
@@ -25,22 +29,22 @@
         <div class="overlay"></div>
     </div>
 </div>
-    {% include 'map_app/includes/navbar.html' %}
-
-<script src="{% static 'map_app/js/main.js' %}"></script>
-<script src="{% static 'map_app/js/map.js' %}"></script>
-<script src="{% static 'map_app/js/modal.js' %}"></script>
-<script src="{% static 'map_app/js/object.js' %}"></script>
+{% include 'map_app/includes/navbar.html' %}
+{% include 'map_app/modal/users/auth_choice_modal.html' %}
+{% include 'map_app/modal/users/login_modal.html' %}
+{% include 'map_app/modal/users/signup_modal.html' %}
+{% include 'map_app/modal/objects/add_object.html' %}
+{% include 'map_app/modal/objects/category_modal_overlay.html' %}
+{% include 'map_app/modal/objects/modal_overlay.html' %}
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script src="{% static 'map_app/js/main.js' %}"></script>
+<script src="{% static 'map_app/js/map.js' %}"></script>
+<script src="{% static 'map_app/js/modal.js' %}"></script>
+<script src="{% static 'map_app/js/object.js' %}"></script>
 {% block scripts %}{% endblock %}
-
-<!-- Модальные окна для входа и регистрации -->
-{% include 'map_app/modal/users/login_modal.html' %}
-{% include 'map_app/modal/users/signup_modal.html' %}
-{% include 'map_app/modal/objects/add_object.html' %}
-
 </body>
 </html>

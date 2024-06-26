@@ -1,58 +1,100 @@
+<!-- project_list.html -->
 {% extends "map_app/base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8">
-            <h1>Проекты</h1>
-            {% if category %}
-                <h2>{{ category.name }}</h2>
-                <p>{{ category.description }}</p>
-            {% endif %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Цвет</th>
-                        <th>Название</th>
-                        <th>Описание</th>
-                        <th>Тип</th>
-                        <th>Дата</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for project in projects %}
-                        <tr>
-                            <td><span style="background-color: {{ project.type_object.color }}; width: 20px; height: 20px; display: inline-block;"></span></td>
-                            <td>{{ project.name }}</td>
-                            <td>{{ project.description }}</td>
-                            <td>{{ project.type_object.name }}</td>
-                            <td>{{ project.date_added }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-md-4">
-            <h2>Категории</h2>
-            <ul class="list-group">
+<div class="project-container">
+    <div class="view-switch">
+        <input type="radio" id="grid-view" name="view" value="grid" class="view-input" {% if view_mode == 'grid' %}checked{% endif %}>
+        <label for="grid-view" class="view-label"><i class="ri-layout-grid-line"></i> Сетка</label>
+        <input type="radio" id="list-view" name="view" value="list" class="view-input" {% if view_mode == 'list' %}checked{% endif %}>
+        <label for="list-view" class="view-label"><i class="ri-list-check-2"></i> Список</label>
+    </div>
+
+    {% if category %}
+    <div class="projects-header">
+        <h2>{{ category.name }}</h2>
+        <p>{{ category.description }}</p>
+    </div>
+    {% else %}
+    <div class="projects-header">
+        <h2>Проекты</h2>
+        <p>Найдите вдохновение в примерах проектов здесь.</p>
+    </div>
+    {% endif %}
+
+    <div class="projects-content">
+        <div class="left-panel">
+            <h3>Категории</h3>
+            <ul class="categories">
                 {% for category in categories %}
-                    <li class="list-group-item">
-                        <a href="?category={{ category.id }}">
-                            <span style="background-color: {{ category.color }};"></span>
+                    <li>
+                        <a href="?category={{ category.id }}&view_mode={{ view_mode }}">
+                            <span class="color" style="background-color: {{ category.color }};"></span>
                             {{ category.name }} ({{ category.total_objects }})
                         </a>
-                        <ul class="type-list" style="display: none;">
-                            {% for type in category_types.category.id %}
-                                <li>
-                                    <span style="background-color: {{ type.color }}"></span>
-                                    <a href="#" class="type-filter" data-type-id="{{ type.id }}">{{ type.name }} ({{ type.published_count }})</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
                     </li>
                 {% endfor %}
             </ul>
         </div>
+
+        <div class="right-panel">
+            <div id="list-view-content" class="view-mode" {% if view_mode == 'grid' %}style="display: none;"{% endif %}>
+                <h3>Проекты ({{ projects.count }} найдено):</h3>
+                <div class="project-list">
+                    {% for project in projects %}
+                    <div class="project-item">
+                        <div class="project-icon">
+                            <i class="ri-map-pin-line"></i>
+                        </div>
+                        <div class="project-details">
+                            <h4>{{ project.name }}</h4>
+                            <p>{{ project.type_object.name }}</p>
+                        </div>
+                        <div class="project-date">
+                            <p>{{ project.date_created|date:"d.m.Y" }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="grid-view-content" class="view-mode" {% if view_mode == 'list' %}style="display: none;"{% endif %}>
+                <h3>Проекты ({{ projects.count }} найдено):</h3>
+                <div class="project-grid">
+                    {% for project in projects %}
+                        <div class="project-card">
+                            <img src="{{ project.image.url }}" alt="{{ project.name }}" class="project-image">
+                            <h4>{{ project.name }}</h4>
+                            <p>{{ project.type_object.name }}</p>
+                            <p>{{ project.date_created|date:"d.m.Y" }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('grid-view').addEventListener('change', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('view_mode', 'grid');
+        window.location.search = urlParams.toString();
+    });
+
+    document.getElementById('list-view').addEventListener('change', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('view_mode', 'list');
+        window.location.search = urlParams.toString();
+    });
+
+    // Set initial view
+    if ("{{ view_mode }}" === "grid") {
+        document.getElementById('grid-view-content').style.display = 'block';
+        document.getElementById('list-view-content').style.display = 'none';
+    } else {
+        document.getElementById('grid-view-content').style.display = 'none';
+        document.getElementById('list-view-content').style.display = 'block';
+    }
+</script>
 {% endblock %}

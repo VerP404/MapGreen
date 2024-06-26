@@ -15,5 +15,4 @@ urlpatterns = [
     path('categories/', category_list, name='category_list'),
     path('api/type_objects/<int:category_id>/', get_type_objects_by_category, name='get_type_objects_by_category'),
     path('api/objects/', get_published_objects, name='get_published_objects'),
-
 ]

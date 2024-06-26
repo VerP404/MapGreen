@@ -1,18 +1,15 @@
-<!-- index.html -->
+<!-- templates/map_app/index.html -->
 {% extends 'map_app/base.html' %}
 
-{% block title %}Зеленая карта{% endblock %}
+{% block title %}Pro Sidebar{% endblock %}
 
 {% block content %}
     <div class="map-container" style="position: relative;">
         <div id="map"></div>
-        <!-- Кнопка добавления объекта -->
         <button id="addObjectBtn" class="add-object-btn">Добавить объект</button>
-        <!-- Сообщение выбора точки на карте -->
         <div id="selectPointMessage" class="select-point-message" style="display: none;">
             Выберите точку на карте
         </div>
-        <!-- Окно подтверждения выбора точки на карте -->
         <div id="confirmSelectionMessage" class="confirm-selection-message" style="display: none;">
             <p>Подтвердите выбор точки</p>
             <button id="confirmBtn" class="confirm-btn">Подтвердить</button>

@@ -33,19 +33,28 @@ class Object(models.Model):
     longitude = models.FloatField()
     polygon = models.TextField(blank=True, null=True)
     type_object = models.ForeignKey(TypeObject, on_delete=models.CASCADE)
-    photos = models.ImageField(upload_to='photos/', blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
     date_created = models.DateTimeField(default=timezone.now)
     date_published = models.DateTimeField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not self.id:  # Only set is_published on new objects
+        if not self.id:
             self.is_published = self.type_object.category.auto_publish
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
+
+
+class Photo(models.Model):
+    object = models.ForeignKey(Object, related_name='photos', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='photos/')
+    description = models.TextField(blank=True)
+    is_main = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Photo for {self.object.name}'
 
 
 class CustomUserManager(BaseUserManager):
