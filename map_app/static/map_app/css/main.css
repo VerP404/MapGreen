@@ -1295,3 +1295,9 @@ body, html {
 
 /* main.css */
 
+
+.pro-sidebar-logo h5 {
+    font-size: 1.2em; /* Adjust font size as needed */
+    line-height: 1.2em; /* Adjust line height as needed */
+    margin: 0;
+}

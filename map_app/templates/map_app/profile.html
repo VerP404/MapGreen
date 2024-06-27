@@ -1,4 +1,9 @@
+<!-- profile.html -->
 {% extends "map_app/base.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'map_app/css/profile.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -15,7 +20,6 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Цвет</th>
                 <th>Название</th>
                 <th>Описание</th>
                 <th>Тип</th>
@@ -25,7 +29,6 @@
         <tbody>
             {% for project in user_projects %}
                 <tr>
-                    <td><span style="background-color: {{ project.type_object.color }}; width: 20px; height: 20px; display: inline-block;"></span></td>
                     <td>{{ project.name }}</td>
                     <td>{{ project.description }}</td>
                     <td>{{ project.type_object.name }}</td>

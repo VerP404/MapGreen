@@ -136,6 +136,10 @@ def project_list_view(request):
         projects = Object.objects.filter(is_published=True)
         category = None
 
+    # Fetch the main photo for each project
+    for project in projects:
+        project.main_photo = project.photos.filter(is_main=True).first()
+
     login_form = LoginForm()
     signup_form = SignupForm()
     form = CustomUserCreationForm()
@@ -176,3 +180,6 @@ def get_published_objects(request):
 
     objects = Object.objects.filter(**filters).values('name', 'description', 'latitude', 'longitude', 'type_object__color')
     return JsonResponse({'objects': list(objects)})
+
+def about_us(request):
+    return render(request, 'map_app/about_us.html')

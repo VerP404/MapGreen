@@ -1,14 +1,8 @@
 <!-- project_list.html -->
 {% extends "map_app/base.html" %}
-
+{%  load static %}
 {% block content %}
 <div class="project-container">
-    <div class="view-switch">
-        <input type="radio" id="grid-view" name="view" value="grid" class="view-input" {% if view_mode == 'grid' %}checked{% endif %}>
-        <label for="grid-view" class="view-label"><i class="ri-layout-grid-line"></i> Сетка</label>
-        <input type="radio" id="list-view" name="view" value="list" class="view-input" {% if view_mode == 'list' %}checked{% endif %}>
-        <label for="list-view" class="view-label"><i class="ri-list-check-2"></i> Список</label>
-    </div>
 
     {% if category %}
     <div class="projects-header">
@@ -21,6 +15,12 @@
         <p>Найдите вдохновение в примерах проектов здесь.</p>
     </div>
     {% endif %}
+    <div class="view-switch">
+        <input type="radio" id="grid-view" name="view" value="grid" class="view-input" {% if view_mode == 'grid' %}checked{% endif %}>
+        <label for="grid-view" class="view-label"><i class="ri-layout-grid-line"></i> Сетка</label>
+        <input type="radio" id="list-view" name="view" value="list" class="view-input" {% if view_mode == 'list' %}checked{% endif %}>
+        <label for="list-view" class="view-label"><i class="ri-list-check-2"></i> Список</label>
+    </div>
 
     <div class="projects-content">
         <div class="left-panel">
@@ -63,10 +63,18 @@
                 <div class="project-grid">
                     {% for project in projects %}
                         <div class="project-card">
-                            <img src="{{ project.image.url }}" alt="{{ project.name }}" class="project-image">
-                            <h4>{{ project.name }}</h4>
-                            <p>{{ project.type_object.name }}</p>
-                            <p>{{ project.date_created|date:"d.m.Y" }}</p>
+                            {% if project.main_photo %}
+                                <img src="{{ project.main_photo.image.url }}" alt="{{ project.name }}" class="project-image">
+                            {% else %}
+                                <img src="{% static 'path/to/default-image.jpg' %}" alt="{{ project.name }}" class="project-image">
+                            {% endif %}
+                            <div class="text-overlay" style="background: {{ project.type_object.color }};">
+                                <div>
+                                    <h4>{{ project.name }}</h4>
+                                    <p class="project-type">{{ project.type_object.name }}</p>
+                                </div>
+                                <p class="project-date">{{ project.date_created|date:"d.m.Y" }}</p>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
