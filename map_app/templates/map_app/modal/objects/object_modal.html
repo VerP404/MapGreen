@@ -1,0 +1,138 @@
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <div class="slider middle">
+        <div class="slides">
+            {% for photo in photos %}
+            <input type="radio" name="r" id="r{{ forloop.counter }}" {% if forloop.first %}checked{% endif %}>
+            {% endfor %}
+
+            {% for photo in photos %}
+            <div class="slide s{{ forloop.counter }}">
+                <img src="{{ photo.image.url }}" alt="Изображение" class="img">
+            </div>
+            {% endfor %}
+        </div>
+        <div class="navigation">
+            {% for photo in photos %}
+            <label for="r{{ forloop.counter }}" class="bar"></label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <h2>{{ object.name }}</h2>
+    <div class="tags">
+        {% for tag in object.tags %}
+        <span style="background: {{ tag.color }}; color: #fff;">{{ tag.name }}</span>
+        {% endfor %}
+    </div>
+    <p>{{ object.description }}</p>
+    <p>Автор: {{ object.user.first_name }} {{ object.user.last_name }} on {{ object.date_created|date:"d-m-Y" }}</p>
+    <h3>Подробнее об объектах типа: {{ object.type_object.name }}</h3>
+    <p>{{ object.type_object.description }}</p>
+</div>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .slider {
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+        overflow: hidden;
+        border: 10px solid #000;
+        position: relative;
+    }
+
+    .middle {
+        position: relative;
+    }
+
+    .navigation {
+        position: absolute;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+    }
+
+    .bar {
+        width: 30px;
+        height: 8px;
+        margin: 6px;
+        cursor: pointer;
+        background-color: #000;
+        opacity: .5;
+        border-radius: 10px;
+        transition: all 0.4s ease;
+    }
+
+    .bar:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    input[name="r"] {
+        position: absolute;
+        visibility: hidden;
+    }
+
+    .slides {
+        width: 400%;
+        display: flex;
+        transition: all 0.6s ease;
+    }
+
+    .slide {
+        width: 25%;
+    }
+
+    .img {
+        width: 100%;
+        height: auto;
+        display: block;
+        max-height: 500px; /* Ограничение максимальной высоты изображений */
+        object-fit: cover; /* Масштабирование изображения с сохранением пропорций */
+    }
+
+    #r1:checked ~ .s1 {
+        margin-left: 0;
+    }
+
+    #r2:checked ~ .s1 {
+        margin-left: -25%;
+    }
+
+    #r3:checked ~ .s1 {
+        margin-left: -50%;
+    }
+
+    #r4:checked ~ .s1 {
+        margin-left: -75%;
+    }
+
+    @media (max-width: 600px) {
+        .bar {
+            width: 20px;
+            height: 5px;
+            margin: 4px;
+        }
+    }
+
+    .card {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .tags span {
+        display: inline-block;
+        padding: 5px;
+        margin: 5px 5px 5px 0;
+        border-radius: 3px;
+    }
+</style>

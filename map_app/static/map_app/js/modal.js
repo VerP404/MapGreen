@@ -1,4 +1,3 @@
-// modal.js
 document.addEventListener('DOMContentLoaded', function () {
     // Переменные для модального окна входа
     const loginModal = document.getElementById('loginModal');

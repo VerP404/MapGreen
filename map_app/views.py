@@ -1,5 +1,5 @@
 from django.db.models import Count, Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -178,8 +178,13 @@ def get_published_objects(request):
     if type_id:
         filters['type_object_id'] = type_id
 
-    objects = Object.objects.filter(**filters).values('name', 'description', 'latitude', 'longitude', 'type_object__color')
+    objects = Object.objects.filter(**filters).values('id', 'name', 'description', 'latitude', 'longitude', 'type_object__color')
     return JsonResponse({'objects': list(objects)})
 
 def about_us(request):
     return render(request, 'map_app/about_us.html')
+
+def object_modal(request, object_id):
+    obj = get_object_or_404(Object, id=object_id)
+    photos = obj.photos.all()  # Получить все связанные фотографии
+    return render(request, 'map_app/modal/objects/object_modal.html', {'object': obj, 'photos': photos})

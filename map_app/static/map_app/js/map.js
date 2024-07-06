@@ -1,4 +1,3 @@
-// static/js/map.js
 document.addEventListener('DOMContentLoaded', function () {
     var map = L.map('map').setView([55.751244, 37.618423], 10);
 
@@ -45,8 +44,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 markers.clearLayers();
 
                 data.objects.forEach(obj => {
+                    if (!obj.id) {
+                        console.error('Object ID is undefined:', obj);
+                        return;
+                    }
+
                     const marker = L.marker([obj.latitude, obj.longitude], { icon: createDropIcon(obj.type_object__color) })
-                        .bindPopup(`<b>${obj.name}</b><br>${obj.description}`);
+                        .on('click', function () {
+                            $.fancybox.open({
+                                src: `/object/${obj.id}/modal/`,
+                                type: 'ajax',
+                                opts: {
+                                    afterShow: function (instance, current) {
+                                        console.info('Modal opened for object:', obj.id);
+                                    }
+                                }
+                            });
+                        });
                     markers.addLayer(marker);
                 });
 
