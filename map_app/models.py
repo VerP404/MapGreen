@@ -87,6 +87,7 @@ class CustomUser(AbstractUser):
     profession = models.CharField(_('Профессия'), max_length=50, blank=True)
     workplace = models.CharField(_('Место работы'), max_length=100, blank=True)
     position = models.CharField(_('Должность'), max_length=50, blank=True)
+    date_joined = models.DateTimeField(_('Дата регистрации'), default=timezone.now)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']

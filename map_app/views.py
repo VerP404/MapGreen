@@ -185,6 +185,16 @@ def about_us(request):
     return render(request, 'map_app/about_us.html')
 
 def object_modal(request, object_id):
-    obj = get_object_or_404(Object, id=object_id)
-    photos = obj.photos.all()  # Получить все связанные фотографии
-    return render(request, 'map_app/modal/objects/object_modal.html', {'object': obj, 'photos': photos})
+    obj = get_object_or_404(Object, pk=object_id)
+    photos = Photo.objects.filter(object=obj)
+    user_projects_count = Object.objects.filter(user=obj.user).count()
+    user_registration_date = obj.user.date_joined
+    category = obj.type_object.category
+
+    return render(request, 'map_app/modal/objects/object_modal.html', {
+        'object': obj,
+        'photos': photos,
+        'user_projects_count': user_projects_count,
+        'user_registration_date': user_registration_date,
+        'category': category,
+    })
