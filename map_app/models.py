@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.deconstruct import deconstructible
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -47,9 +49,20 @@ class Object(models.Model):
         return self.name
 
 
+@deconstructible
+class PathAndRename:
+    def __call__(self, instance, filename):
+        ext = filename.split('.')[-1]
+        return f'projects/{instance.object.id}/{filename}'
+
+
+def get_upload_path(instance, filename):
+    return f'projects/{instance.object.id}/{filename}'
+
+
 class Photo(models.Model):
     object = models.ForeignKey(Object, related_name='photos', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='photos/')
+    image = models.ImageField(upload_to=get_upload_path)
     description = models.TextField(blank=True)
     is_main = models.BooleanField(default=False)
 
@@ -77,6 +90,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_superuser=True.'))
 
         return self.create_user(email, password, **extra_fields)
+
 
 class CustomUser(AbstractUser):
     username = None

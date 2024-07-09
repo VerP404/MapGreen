@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.style.display = 'none';
     }
 
+    // Ваша существующая функция загрузки изображения
     function loadImage(event, id) {
         const input = event.target;
         const reader = new FileReader();
@@ -44,10 +45,30 @@ document.addEventListener('DOMContentLoaded', function () {
         reader.readAsDataURL(input.files[0]);
     }
 
+    // Ваша существующая функция удаления изображения
     function removeImage(id) {
         const imageContainer = document.getElementById(id);
         imageContainer.innerHTML = '<input type="file" accept="image/*" onchange="loadImage(event, \'' + id + '\')">' +
                                    '<span class="delete-icon" onclick="removeImage(\'' + id + '\')">&times;</span>';
+    }
+
+    // Новая функция для предпросмотра изображений
+    function previewImages() {
+        const imageInputs = document.querySelectorAll('input[type="file"]');
+        imageInputs.forEach(input => {
+            input.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = e.target.result;
+                    imgElement.style.maxWidth = '100px'; // Или любое другое значение для предпросмотра
+                    imgElement.style.maxHeight = '100px'; // Или любое другое значение для предпросмотра
+                    input.parentNode.insertBefore(imgElement, input.nextSibling);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
     }
 
     if (addObjectBtn) {
@@ -144,6 +165,9 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Ошибка:', error));
     });
+
+    // Вызов функции предпросмотра изображений
+    previewImages();
 });
 
 // Attach the loadImage function to window so it can be called from inline event handlers

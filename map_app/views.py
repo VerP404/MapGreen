@@ -1,3 +1,5 @@
+import os
+
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -11,7 +13,7 @@ from allauth.account.forms import LoginForm, SignupForm
 from django.contrib.auth import login as auth_login
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from django.conf import settings
 import logging
 
 
@@ -90,17 +92,30 @@ def add_object(request):
             photos = request.FILES.getlist('photos')
 
             for index, photo in enumerate(photos):
-                Photo.objects.create(
+                photo_instance = Photo.objects.create(
                     object=new_object,
                     image=photo,
                     is_main=(index == main_photo_index)
                 )
+                # Rename the file
+                project_folder = os.path.join(settings.MEDIA_ROOT, f'projects/{new_object.id}')
+                os.makedirs(project_folder, exist_ok=True)
+                new_filename = f'{index + 1}.{photo_instance.image.name.split(".")[-1]}'
+                new_path = os.path.join(project_folder, new_filename)
+                os.rename(photo_instance.image.path, new_path)
+                photo_instance.image.name = f'projects/{new_object.id}/{new_filename}'
+                photo_instance.save()
             return JsonResponse({'status': 'success'})
         else:
             return JsonResponse({'status': 'error', 'errors': form.errors})
     else:
         form = ObjectForm()
-    return render(request, 'map_app/modal/objects/add_object.html', {'form': form, 'categories': Category.objects.all()})
+    return render(request, 'map_app/modal/objects/add_object.html',
+                  {'form': form, 'categories': Category.objects.all()})
+
+
+
+
 @login_required
 def profile_view(request):
     user_projects = Object.objects.filter(user=request.user)
