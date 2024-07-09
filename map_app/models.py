@@ -11,8 +11,7 @@ class Category(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     color = models.CharField(max_length=7, unique=False, default='#0000FF')
-    icon = models.CharField(max_length=50, default='ri-file-list-line')  # Поле для выбора иконки
-    auto_publish = models.BooleanField(default=False)  # Поле для автоматической публикации
+    icon = models.CharField(max_length=50, default='ri-file-list-line')
 
     def __str__(self):
         return self.name
@@ -22,7 +21,7 @@ class TypeObject(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='types')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    color = models.CharField(max_length=7, unique=True)  # Цвет в формате HEX
+    color = models.CharField(max_length=7, unique=True)
 
     def __str__(self):
         return self.name
@@ -42,7 +41,7 @@ class Object(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            self.is_published = self.type_object.category.auto_publish
+            self.is_published = self.user.auto_publish
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -101,6 +100,7 @@ class CustomUser(AbstractUser):
     profession = models.CharField(_('Профессия'), max_length=50, blank=True)
     workplace = models.CharField(_('Место работы'), max_length=100, blank=True)
     position = models.CharField(_('Должность'), max_length=50, blank=True)
+    auto_publish = models.BooleanField(default=False, verbose_name="Автопубликация")
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']

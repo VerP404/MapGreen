@@ -21,7 +21,8 @@ class ObjectForm(forms.ModelForm):
         if 'category' in self.data:
             try:
                 category_id = int(self.data.get('category'))
-                self.fields['type_object'].queryset = TypeObject.objects.filter(category_id=category_id).order_by('name')
+                self.fields['type_object'].queryset = TypeObject.objects.filter(category_id=category_id).order_by(
+                    'name')
             except (ValueError, TypeObject.DoesNotExist):
                 self.fields['type_object'].queryset = TypeObject.objects.none()
         elif self.instance.pk:
@@ -37,6 +38,7 @@ class PhotoForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 2}),
         }
+
 
 PhotoFormSet = forms.inlineformset_factory(Object, Photo, form=PhotoForm, extra=3)
 

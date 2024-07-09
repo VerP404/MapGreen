@@ -40,7 +40,7 @@ def register(request):
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({'success': True, 'email': user.email})
             else:
-                return redirect('index')  # Redirect to the main page or another page after successful registration
+                return redirect('index')
         else:
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'errors': form.errors})
@@ -191,7 +191,8 @@ def get_published_objects(request):
     if type_id:
         filters['type_object_id'] = type_id
 
-    objects = Object.objects.filter(**filters).values('id', 'name', 'description', 'latitude', 'longitude', 'type_object__color')
+    objects = Object.objects.filter(**filters).values('id', 'name', 'description', 'latitude', 'longitude',
+                                                      'type_object__color')
     return JsonResponse({'objects': list(objects)})
 
 
