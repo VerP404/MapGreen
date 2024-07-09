@@ -1,0 +1,222 @@
+{% load static %}
+<div class="card">
+    <div class="slider middle">
+        <div class="slides">
+            {% for photo in photos %}
+            <input type="radio" name="r" id="r{{ forloop.counter }}" {% if forloop.first %}checked{% endif %}>
+            {% endfor %}
+
+            {% for photo in photos %}
+            <div class="slide s{{ forloop.counter }}">
+                <img src="{{ photo.image.url }}" alt="Изображение" class="img">
+            </div>
+            {% empty %}
+            <div class="slide">
+                <img src="{% static 'map_app/img/placeholder-image.jpg' %}" alt="Заглушка" class="img">
+            </div>
+            {% endfor %}
+        </div>
+        <div class="navigation">
+            {% for photo in photos %}
+            <label for="r{{ forloop.counter }}" class="bar"></label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-content">
+            <h1>{{ object.name }}</h1>
+            <div class="tags">
+                <span style="background: {{ object.type_object.color }}; color: #fff;">{{ object.type_object.name }}</span>
+                <span style="background: {{ object.type_object.category.color }}; color: #fff;">{{ object.type_object.category.name }}</span>
+            </div>
+            <p class="created-by">Дата публикации: {{ object.date_created|date:"d-m-Y" }}</p>
+        </div>
+        <div class="profile">
+            <div class="details">
+                <p><i class="ri-user-line"></i> {{ object.user.first_name }} {{ object.user.last_name }}</p>
+                <p><i class="ri-calendar-line"></i> Участник проекта с {{ object.user.date_joined|date:"d-m-Y" }}</p>
+                <p><i class="ri-folder-line"></i> {{ user_projects_count }} опубликованных проектов</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="about">
+        <p>{{ object.description }}</p>
+    </div>
+    <div class="about">
+        <h3>Подробнее об объектах категории: {{ object.type_object.category.name }}</h3>
+        <p>{{ object.type_object.category.description }}</p>
+    </div>
+    <div class="links">
+        <h3>Ссылки на дополнительные материалы</h3>
+        <a href="#"><i class="ri-file-list-line"></i> Подробнее об этом типе</a>
+        <a href="#"><i class="ri-folder-line"></i> 808 связанных проектов</a>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .card {
+        width: 100%;
+        max-width: 1100px;
+        margin: 20px auto;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid #e0e0e0;
+        flex-wrap: wrap; /* Added for responsive adjustment */
+    }
+    .header-content {
+        flex: 1; /* Ensures the header content takes up available space */
+    }
+    .header .tags {
+        display: flex;
+        gap: 10px;
+    }
+    .header .tags span {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        text-shadow: 1px 1px 1px #000; /* Добавление обводки текста */
+    }
+    .profile {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding-top: 30px;
+    }
+    .profile .details {
+        display: flex;
+        flex-direction: column;
+    }
+    .profile .details p {
+        margin: 2px 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .about {
+        margin-top: 20px;
+        background-color: #f4f4f4;
+        padding: 20px;
+        border-left: 2px solid #e0e0e0;
+    }
+    .about ul {
+        list-style-type: disc;
+        margin-left: 20px;
+    }
+    .links {
+        border-left: 2px solid #e0e0e0;
+        padding-left: 20px;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+    .links a {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        text-decoration: none;
+        color: #007bff;
+        gap: 5px;
+    }
+    .slider {
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        border: 2px solid #000;
+        position: relative;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .middle {
+        position: relative;
+    }
+    .navigation {
+        position: absolute;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+    }
+    .bar {
+        width: 30px;
+        height: 8px;
+        margin: 6px;
+        cursor: pointer;
+        background-color: #f8fcf8;
+        border: 2px solid #707270;
+        border-radius: 10px;
+        transition: all 0.4s ease;
+    }
+    .bar:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    input[name="r"] {
+        position: absolute;
+        visibility: hidden;
+    }
+    .slides {
+        width: 400%;
+        display: flex;
+        transition: all 0.6s ease;
+    }
+    .slide {
+        width: 25%;
+    }
+    .img {
+        width: 100%;
+        height: auto;
+        display: block;
+        max-height: 500px;
+        object-fit: cover;
+    }
+    #r1:checked ~ .s1 {
+        margin-left: 0;
+    }
+    #r2:checked ~ .s1 {
+        margin-left: -25%;
+    }
+    #r3:checked ~ .s1 {
+        margin-left: -50%;
+    }
+    #r4:checked ~ .s1 {
+        margin-left: -75%;
+    }
+    .created-by {
+        font-size: 12px;
+        font-style: italic;
+        margin: 0;
+        padding-top: 5px;
+    }
+
+    @media (max-width: 1100px) {
+        .card {
+            width: 100%;
+            padding: 10px;
+        }
+    }
+
+    @media (max-width: 800px) {
+        .header {
+            flex-direction: column;
+        }
+        .profile {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    }
+</style>
