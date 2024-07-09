@@ -26,11 +26,22 @@
         <div class="left-panel">
             <h3>Категории</h3>
             <ul class="categories">
+                <li>
+                    <a href="/projects/">
+                        <span class="menu-icon">
+                            <i class="ri-folder-line"></i>
+                        </span>
+                        <span class="menu-title">Все</span>
+                    </a>
+                </li>
                 {% for category in categories %}
                     <li>
                         <a href="?category={{ category.id }}&view_mode={{ view_mode }}">
-                            <span class="color" style="background-color: {{ category.color }};"></span>
-                            {{ category.name }} ({{ category.total_objects }})
+                            <span class="menu-icon">
+                                <i class="{{ category.icon }}" style="color: {{ category.color }}"></i>
+                            </span>
+                            <span class="menu-title">{{ category.name }}</span>
+                            <span> ({{ category.total_objects }})</span>
                         </a>
                     </li>
                 {% endfor %}
@@ -40,33 +51,35 @@
         <div class="right-panel">
             <div id="list-view-content" class="view-mode" {% if view_mode == 'grid' %}style="display: none;"{% endif %}>
                 <h3>Проекты ({{ projects.count }} найдено):</h3>
-                <div class="project-list">
-                    {% for project in projects %}
-                    <div class="project-item">
-                        <div class="project-icon">
-                            <i class="ri-map-pin-line"></i>
-                        </div>
-                        <div class="project-details">
-                            <h4>{{ project.name }}</h4>
-                            <p>{{ project.type_object.name }}</p>
-                        </div>
-                        <div class="project-date">
-                            <p>{{ project.date_created|date:"d.m.Y" }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
+                <table class="project-table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Тип объекта</th>
+                            <th>Дата создания</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                        <tr data-project-id="{{ project.id }}">
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.type_object.name }}</td>
+                            <td>{{ project.date_created|date:"d.m.Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
             <div id="grid-view-content" class="view-mode" {% if view_mode == 'list' %}style="display: none;"{% endif %}>
                 <h3>Проекты ({{ projects.count }} найдено):</h3>
                 <div class="project-grid">
                     {% for project in projects %}
-                        <div class="project-card">
+                        <div class="project-card" data-project-id="{{ project.id }}">
                             {% if project.main_photo %}
                                 <img src="{{ project.main_photo.image.url }}" alt="{{ project.name }}" class="project-image">
                             {% else %}
-                                <img src="{% static 'path/to/default-image.jpg' %}" alt="{{ project.name }}" class="project-image">
+                                <img src="{% static 'map_app/img/placeholder-image.jpg' %}" alt="{{ project.name }}" class="project-image">
                             {% endif %}
                             <div class="text-overlay" style="background: {{ project.type_object.color }};">
                                 <div>
@@ -104,5 +117,23 @@
         document.getElementById('grid-view-content').style.display = 'none';
         document.getElementById('list-view-content').style.display = 'block';
     }
+
+    // Добавление обработчика событий для открытия модального окна
+    document.querySelectorAll('.project-item, .project-card, .project-table tbody tr').forEach(item => {
+        item.addEventListener('click', function() {
+            const projectId = this.dataset.projectId;
+            if (projectId) {
+                $.fancybox.open({
+                    src: `/object/${projectId}/modal/`,
+                    type: 'ajax',
+                    opts: {
+                        afterShow: function (instance, current) {
+                            console.info('Modal opened for project:', projectId);
+                        }
+                    }
+                });
+            }
+        });
+    });
 </script>
 {% endblock %}

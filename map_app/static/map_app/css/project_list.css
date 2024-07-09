@@ -89,7 +89,7 @@ body {
 }
 
 .categories li a:hover {
-    text-decoration: underline;
+    text-decoration: none; /* Отмена подчеркивания при наведении */
 }
 
 .categories li .color {
@@ -188,6 +188,34 @@ body {
     white-space: nowrap;
 }
 
+/* Стили для таблицы проектов */
+.project-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.project-table th, .project-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.project-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.project-table tbody tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+.project-table tbody tr:hover td {
+    border-color: green; /* Зеленый контур при наведении */
+    transition: border 0.3s ease; /* Плавный переход */
+}
+
 /* Media Queries for Responsive Design */
 @media (max-width: 1200px) {
     .project-card {
@@ -229,6 +257,12 @@ body {
     .project-details {
         margin-top: 5px;
     }
+}
+
+.project-item:hover,
+.project-card:hover {
+    border: 2px solid green; /* Добавляем зеленый контур при наведении */
+    transition: border 0.3s ease; /* Плавный переход */
 }
 
 @media (max-width: 576px) {
