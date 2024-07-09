@@ -1,3 +1,4 @@
+<!-- templates/map_app/modal/objects/object_modal.html -->
 {% load static %}
 <div class="card">
     <div class="slider middle">
@@ -50,8 +51,11 @@
     </div>
     <div class="links">
         <h3>Ссылки на дополнительные материалы</h3>
-        <a href="#"><i class="ri-file-list-line"></i> Подробнее об этом типе</a>
-        <a href="#"><i class="ri-folder-line"></i> 808 связанных проектов</a>
+        {% for link in object.links.all %}
+        <div>
+            <a href="{{ link.url }}" target="_blank">{{ link.description }}</a>
+        </div>
+        {% endfor %}
     </div>
 </div>
 

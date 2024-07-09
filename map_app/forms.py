@@ -1,6 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import Object, CustomUser, Category, TypeObject, Photo
+from .models import Object, CustomUser, Category, TypeObject, Photo, Link
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -41,6 +41,18 @@ class PhotoForm(forms.ModelForm):
 
 
 PhotoFormSet = forms.inlineformset_factory(Object, Photo, form=PhotoForm, extra=3)
+
+
+class LinkForm(forms.ModelForm):
+    class Meta:
+        model = Link
+        fields = ['url', 'description']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 2}),
+        }
+
+
+LinkFormSet = forms.inlineformset_factory(Object, Link, form=LinkForm, extra=3)
 
 
 class CustomUserCreationForm(UserCreationForm):

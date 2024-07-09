@@ -69,6 +69,15 @@ class Photo(models.Model):
         return f'Photo for {self.object.name}'
 
 
+class Link(models.Model):
+    object = models.ForeignKey(Object, related_name='links', on_delete=models.CASCADE)
+    url = models.URLField()
+    description = models.TextField()
+
+    def __str__(self):
+        return self.url
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:

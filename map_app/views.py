@@ -7,8 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from allauth.account.views import SignupView, LoginView
-from .models import Category, Object, TypeObject, Photo
-from .forms import ObjectForm, CustomUserCreationForm, CustomSignupForm, PhotoFormSet
+from .models import Category, Object, TypeObject, Photo, Link
+from .forms import ObjectForm, CustomUserCreationForm, CustomSignupForm, PhotoFormSet, LinkFormSet
 from allauth.account.forms import LoginForm, SignupForm
 from django.contrib.auth import login as auth_login
 from django.utils.decorators import method_decorator
@@ -105,13 +105,27 @@ def add_object(request):
                 os.rename(photo_instance.image.path, new_path)
                 photo_instance.image.name = f'projects/{new_object.id}/{new_filename}'
                 photo_instance.save()
+
+            # Обработка ссылок
+            links = []
+            for i in range(1, 7):
+                url = request.POST.get(f'link_url_{i}')
+                description = request.POST.get(f'link_description_{i}')
+                if url and description:
+                    links.append(Link(object=new_object, url=url, description=description))
+            Link.objects.bulk_create(links)
+
             return JsonResponse({'status': 'success'})
         else:
             return JsonResponse({'status': 'error', 'errors': form.errors})
     else:
         form = ObjectForm()
-    return render(request, 'map_app/modal/objects/add_object.html',
-                  {'form': form, 'categories': Category.objects.all()})
+    return render(request, 'map_app/modal/objects/add_object.html', {
+        'form': form,
+        'categories': Category.objects.all(),
+        'photo_formset': PhotoFormSet(),
+        'link_formset': LinkFormSet(),
+    })
 
 
 @login_required
