@@ -74,14 +74,14 @@ class ObjectResource(resources.ModelResource):
     class Meta:
         model = Object
         fields = (
-            'id', 'name', 'description', 'latitude', 'longitude', 'type_object__name', 'user__email', 'is_published')
+            'id', 'name', 'description', 'is_published', 'latitude', 'longitude', 'type_object__name', 'user__email')
         export_order = (
-            'id', 'name', 'description', 'latitude', 'longitude', 'type_object__name', 'user__email', 'is_published')
+            'id', 'name', 'description', 'is_published', 'latitude', 'longitude', 'type_object__name', 'user__email')
 
 
 class ObjectAdmin(ImportExportModelAdmin):
     resource_class = ObjectResource
-    list_display = ('name', 'description', 'latitude', 'longitude', 'type_object', 'user', 'is_published')
+    list_display = ('name', 'description', 'is_published', 'latitude', 'longitude', 'type_object', 'user', 'is_published')
     list_filter = ('type_object', 'user', 'is_published')
     search_fields = ('name', 'description', 'type_object__name', 'user__email')
     inlines = [PhotoInline]

@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const typeObjectSelect = document.getElementById('type_object');
     const latitudeInput = document.getElementById('latitude');
     const longitudeInput = document.getElementById('longitude');
+    let isAddingObject = false;
     let marker;
 
     function showModal(modal) {
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
         addObjectBtn.addEventListener('click', function () {
             selectPointMessage.style.display = 'block';
             document.getElementById('map').style.cursor = 'crosshair';
+            isAddingObject = true;
         });
     }
 
@@ -99,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 marker = null;
             }
             document.getElementById('map').style.cursor = '';
+            isAddingObject = false;
         });
     }
 
@@ -107,6 +110,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (map) {
         map.on('click', function (e) {
+            if (!isAddingObject) return;
+
             const lat = e.latlng.lat;
             const lng = e.latlng.lng;
 
@@ -122,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
             selectPointMessage.style.display = 'none';
             confirmSelectionMessage.style.display = 'block';
             document.getElementById('map').style.cursor = '';
+            isAddingObject = false;
         });
     }
 
