@@ -1,7 +1,7 @@
 import os
 
 from django.db.models import Count, Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -114,8 +114,6 @@ def add_object(request):
                   {'form': form, 'categories': Category.objects.all()})
 
 
-
-
 @login_required
 def profile_view(request):
     user_projects = Object.objects.filter(user=request.user)
@@ -193,8 +191,25 @@ def get_published_objects(request):
     if type_id:
         filters['type_object_id'] = type_id
 
-    objects = Object.objects.filter(**filters).values('name', 'description', 'latitude', 'longitude', 'type_object__color')
+    objects = Object.objects.filter(**filters).values('id', 'name', 'description', 'latitude', 'longitude', 'type_object__color')
     return JsonResponse({'objects': list(objects)})
+
 
 def about_us(request):
     return render(request, 'map_app/about_us.html')
+
+
+def object_modal(request, object_id):
+    obj = get_object_or_404(Object, pk=object_id)
+    photos = Photo.objects.filter(object=obj)
+    user_projects_count = Object.objects.filter(user=obj.user).count()
+    user_registration_date = obj.user.date_joined
+    category = obj.type_object.category
+
+    return render(request, 'map_app/modal/objects/object_modal.html', {
+        'object': obj,
+        'photos': photos,
+        'user_projects_count': user_projects_count,
+        'user_registration_date': user_registration_date,
+        'category': category,
+    })
