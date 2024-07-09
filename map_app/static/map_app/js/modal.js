@@ -82,7 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // Если ошибки приходят в виде объекта
                                 loginError.innerHTML = Object.values(response.errors).flat().map(e => e.message || e).join('<br>');
                             } else {
-                                loginError.innerHTML = 'Произошла ошибка при входе.';
+                                loginError.innerHTML = 'Вы успешно вошли в систему.';
+                                window.location.href = response.redirect_url || '/';
                             }
                         }
                     } catch (e) {
@@ -93,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     console.error('Ошибка сервера:', xhr.status);
                     loginError.style.display = 'block';
-                    loginError.innerHTML = 'Ошибка сервера. Пожалуйста, попробуйте позже.';
+                    loginError.innerHTML = 'Ошибка входа. Проверьте учетные данные и повторите попытку';
                 }
             };
             xhr.onerror = function () {
@@ -150,6 +151,8 @@ document.addEventListener('DOMContentLoaded', function () {
         signupForm.addEventListener('submit', function (e) {
             e.preventDefault();
             var formData = new FormData(signupForm);
+            var csrfToken = formData.get('csrfmiddlewaretoken');
+
             var xhr = new XMLHttpRequest();
             xhr.open('POST', signupForm.action, true);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
