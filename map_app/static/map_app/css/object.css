@@ -227,3 +227,9 @@ button.btn.btn-primary:hover {
     color: black;
     text-decoration: none;
 }
+
+
+.confirm-selection-message p {
+    color: white; /* Устанавливаем белый цвет текста */
+}
+
