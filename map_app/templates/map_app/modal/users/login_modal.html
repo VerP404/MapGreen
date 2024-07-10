@@ -1,10 +1,11 @@
 <!-- login_modal.html -->
+{% load static %}
 <div id="loginModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
         <div class="login-form-container">
             <div class="login-form">
-                <h5>Войти</h5>
+                <h5 class="auth-title">Авторизация</h5>
                 <div id="loginError" class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
                 <div id="loginSuccess" class="success-message" style="display: none; color: green; margin-bottom: 10px;"></div>
                 <form id="loginForm" method="post" action="{% url 'account_login' %}">
@@ -18,15 +19,15 @@
                         <input type="password" name="password" autocomplete="current-password" class="form-control" required id="id_password">
                     </div>
                     <a href="{% url 'account_reset_password' %}" class="forgot-password">Забыли свой пароль?</a>
-                    <div class="form-group remember-me">
-                        <input type="checkbox" name="remember" id="id_remember">
+                    <div class="form-group remember-me" style="display: flex; align-items: center;">
+                        <input type="checkbox" name="remember" id="id_remember" style="margin-right: 5px;">
                         <label for="id_remember">Запомнить меня</label>
                     </div>
                     <button type="submit" class="btn btn-primary">Войти</button>
                 </form>
             </div>
             <div class="login-info">
-                <p>текст</p>
+                <img src="{% static 'map_app/img/logo.png' %}" alt="Logo" style="width: 100%; height: auto;">
             </div>
         </div>
     </div>

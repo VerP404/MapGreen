@@ -1,118 +1,119 @@
-<!-- add_object.html -->
 <div id="objectFormModal" class="modal">
     <div class="modal-content top-modal">
         <span class="close" id="closeFormModalBtn">&times;</span>
-        <h2>Добавить объект</h2>
-        <form id="objectForm" method="post" action="{% url 'add_object' %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="name">Название</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Описание</label>
-                <textarea id="description" name="description" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="category">Категория</label>
-                <select id="category" name="category" required>
-                    <option value="">Выберите категорию</option>
-                    {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="type_object">Тип объекта</label>
-                <select id="type_object" name="type_object" required>
-                    <option value="">Выберите тип объекта</option>
-                </select>
-            </div>
-            <div class="form-group" style="display: none;">
-                <label for="latitude">Широта</label>
-                <input type="text" id="latitude" name="latitude" readonly required>
-            </div>
-            <div class="form-group" style="display: none;">
-                <label for="longitude">Долгота</label>
-                <input type="text" id="longitude" name="longitude" readonly required>
-            </div>
+        <div class="modal-body">
+            <h2>Добавить объект</h2>
+            <form id="objectForm" method="post" action="{% url 'add_object' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Название</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Описание</label>
+                    <textarea id="description" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Категория</label>
+                    <select id="category" name="category" required>
+                        <option value="">Выберите категорию</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="type_object">Тип объекта</label>
+                    <select id="type_object" name="type_object" required>
+                        <option value="">Выберите тип объекта</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display: none;">
+                    <label for="latitude">Широта</label>
+                    <input type="text" id="latitude" name="latitude" readonly required>
+                </div>
+                <div class="form-group" style="display: none;">
+                    <label for="longitude">Долгота</label>
+                    <input type="text" id="longitude" name="longitude" readonly required>
+                </div>
 
-            <div class="form-group">
-                <label>Фотографии</label>
-                <div id="additionalImages">
-                    <div id="additionalImage1" class="image-input">
-                        <input type="file" name="photos" accept="image/*"
-                               onchange="loadImage(event, 'additionalImage1')">
-                        <span class="delete-icon" onclick="removeImage('additionalImage1')">&times;</span>
-                    </div>
-                    <div id="additionalImage2" class="image-input">
-                        <input type="file" name="photos" accept="image/*"
-                               onchange="loadImage(event, 'additionalImage2')">
-                        <span class="delete-icon" onclick="removeImage('additionalImage2')">&times;</span>
-                    </div>
-                    <div id="additionalImage3" class="image-input">
-                        <input type="file" name="photos" accept="image/*"
-                               onchange="loadImage(event, 'additionalImage3')">
-                        <span class="delete-icon" onclick="removeImage('additionalImage3')">&times;</span>
-                    </div>
-                    <div id="additionalImage4" class="image-input">
-                        <input type="file" name="photos" accept="image/*"
-                               onchange="loadImage(event, 'additionalImage4')">
-                        <span class="delete-icon" onclick="removeImage('additionalImage4')">&times;</span>
-                    </div>
-                    <div id="additionalImage5" class="image-input">
-                        <input type="file" name="photos" accept="image/*"
-                               onchange="loadImage(event, 'additionalImage5')">
-                        <span class="delete-icon" onclick="removeImage('additionalImage5')">&times;</span>
-                    </div>
-                    <div id="additionalImage6" class="image-input">
-                        <input type="file" name="photos" accept="image/*"
-                               onchange="loadImage(event, 'additionalImage6')">
-                        <span class="delete-icon" onclick="removeImage('additionalImage6')">&times;</span>
+                <div class="form-group">
+                    <button type="button" class="custom-btn btn-16" onclick="toggleSection('photosSection')">Фотографии</button>
+                    <div id="photosSection" class="toggle-section" style="display: none;">
+                        <div id="additionalImages">
+                            <div id="additionalImage1" class="image-input">
+                                <input type="file" name="photos" accept="image/*" onchange="loadImage(event, 'additionalImage1')">
+                                <span class="delete-icon" onclick="removeImage('additionalImage1')">&times;</span>
+                            </div>
+                            <div id="additionalImage2" class="image-input">
+                                <input type="file" name="photos" accept="image/*" onchange="loadImage(event, 'additionalImage2')">
+                                <span class="delete-icon" onclick="removeImage('additionalImage2')">&times;</span>
+                            </div>
+                            <div id="additionalImage3" class="image-input">
+                                <input type="file" name="photos" accept="image/*" onchange="loadImage(event, 'additionalImage3')">
+                                <span class="delete-icon" onclick="removeImage('additionalImage3')">&times;</span>
+                            </div>
+                            <div id="additionalImage4" class="image-input">
+                                <input type="file" name="photos" accept="image/*" onchange="loadImage(event, 'additionalImage4')">
+                                <span class="delete-icon" onclick="removeImage('additionalImage4')">&times;</span>
+                            </div>
+                            <div id="additionalImage5" class="image-input">
+                                <input type="file" name="photos" accept="image/*" onchange="loadImage(event, 'additionalImage5')">
+                                <span class="delete-icon" onclick="removeImage('additionalImage5')">&times;</span>
+                            </div>
+                            <div id="additionalImage6" class="image-input">
+                                <input type="file" name="photos" accept="image/*" onchange="loadImage(event, 'additionalImage6')">
+                                <span class="delete-icon" onclick="removeImage('additionalImage6')">&times;</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>Ссылки</label>
-        <div>
-            <label for="link_url_1">Ссылка 1 URL:</label>
-            <input type="url" id="link_url_1" name="link_url_1">
-            <label for="link_description_1">Описание 1:</label>
-            <textarea id="link_description_1" name="link_description_1"></textarea>
+
+                <div class="form-group">
+                    <button type="button" class="custom-btn btn-16" onclick="toggleSection('linksSection')">Ссылки</button>
+                    <div id="linksSection" class="toggle-section" style="display: none;">
+                        <div>
+                            <label for="link_url_1">Ссылка 1 URL:</label>
+                            <input type="url" id="link_url_1" name="link_url_1">
+                            <label for="link_description_1">Описание 1:</label>
+                            <textarea id="link_description_1" name="link_description_1"></textarea>
+                        </div>
+                        <div>
+                            <label for="link_url_2">Ссылка 2 URL:</label>
+                            <input type="url" id="link_url_2" name="link_url_2">
+                            <label for="link_description_2">Описание 2:</label>
+                            <textarea id="link_description_2" name="link_description_2"></textarea>
+                        </div>
+                        <div>
+                            <label for="link_url_3">Ссылка 3 URL:</label>
+                            <input type="url" id="link_url_3" name="link_url_3">
+                            <label for="link_description_3">Описание 3:</label>
+                            <textarea id="link_description_3" name="link_description_3"></textarea>
+                        </div>
+                        <div>
+                            <label for="link_url_4">Ссылка 4 URL:</label>
+                            <input type="url" id="link_url_4" name="link_url_4">
+                            <label for="link_description_4">Описание 4:</label>
+                            <textarea id="link_description_4" name="link_description_4"></textarea>
+                        </div>
+                        <div>
+                            <label for="link_url_5">Ссылка 5 URL:</label>
+                            <input type="url" id="link_url_5" name="link_url_5">
+                            <label for="link_description_5">Описание 5:</label>
+                            <textarea id="link_description_5" name="link_description_5"></textarea>
+                        </div>
+                        <div>
+                            <label for="link_url_6">Ссылка 6 URL:</label>
+                            <input type="url" id="link_url_6" name="link_url_6">
+                            <label for="link_description_6">Описание 6:</label>
+                            <textarea id="link_description_6" name="link_description_6"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Добавить</button>
+            </form>
         </div>
-        <div>
-            <label for="link_url_2">Ссылка 2 URL:</label>
-            <input type="url" id="link_url_2" name="link_url_2">
-            <label for="link_description_2">Описание 2:</label>
-            <textarea id="link_description_2" name="link_description_2"></textarea>
-        </div>
-        <div>
-            <label for="link_url_3">Ссылка 3 URL:</label>
-            <input type="url" id="link_url_3" name="link_url_3">
-            <label for="link_description_3">Описание 3:</label>
-            <textarea id="link_description_3" name="link_description_3"></textarea>
-        </div>
-        <div>
-            <label for="link_url_4">Ссылка 4 URL:</label>
-            <input type="url" id="link_url_4" name="link_url_4">
-            <label for="link_description_4">Описание 4:</label>
-            <textarea id="link_description_4" name="link_description_4"></textarea>
-        </div>
-        <div>
-            <label for="link_url_5">Ссылка 5 URL:</label>
-            <input type="url" id="link_url_5" name="link_url_5">
-            <label for="link_description_5">Описание 5:</label>
-            <textarea id="link_description_5" name="link_description_5"></textarea>
-        </div>
-        <div>
-            <label for="link_url_6">Ссылка 6 URL:</label>
-            <input type="url" id="link_url_6" name="link_url_6">
-            <label for="link_description_6">Описание 6:</label>
-            <textarea id="link_description_6" name="link_description_6"></textarea>
-        </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Добавить</button>
-        </form>
     </div>
 </div>
 

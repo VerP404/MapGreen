@@ -213,13 +213,34 @@ button.btn.btn-primary:hover {
 .modal-content.top-modal {
     margin: 2% auto; /* Adjust the top margin to position it higher */
 }
+/* Медиа-запрос для экранов с шириной 992px и меньше */
+@media (max-width: 992px) {
+    .modal-content.top-modal {
+        margin: 10% auto; /* Увеличиваем margin-top на 40px */
+    }
+}
+@media (max-width: 710px) {
+    .modal-content.top-modal {
+        margin: 16% auto; /* Увеличиваем margin-top на 40px */
+    }
+}
 
+@media (max-width: 500px) {
+    .modal-content.top-modal {
+        margin: 20% auto; /* Увеличиваем margin-top на 40px */
+    }
+}
 .close {
     color: #aaa;
-    float: right;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    display: inline-block; /* предотвращает растягивание элемента на всю ширину */
+    padding: 5px; /* увеличивает область клика */
+    margin: 0; /* сбрасывает отступы */
+    position: absolute; /* фиксирует позицию в правом верхнем углу */
+    top: 10px; /* позиция сверху */
+    right: 10px; /* позиция справа */
 }
 
 .close:hover,
@@ -229,7 +250,88 @@ button.btn.btn-primary:hover {
 }
 
 
+
+
+
 .confirm-selection-message p {
     color: white; /* Устанавливаем белый цвет текста */
 }
 
+.toggle-button {
+    margin-bottom: 10px;
+}
+
+.toggle-section {
+    margin-top: 10px;
+}
+.modal-body{
+    width: 100%;
+}
+/* Добавим этот стиль для контроля ширины всех форм */
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select,
+.form-group input[type="url"] {
+    width: 100%; /* Увеличиваем ширину */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: block;
+    box-sizing: border-box; /* Это гарантирует, что padding и border не увеличивают ширину элемента */
+}
+
+/* Обновим стили для кнопок */
+.custom-btn {
+  width: 130px;
+  height: 40px;
+  color: #fff;
+  border-radius: 5px;
+  padding: 10px 25px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+   box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
+   7px 7px 20px 0px rgba(0,0,0,.1),
+   4px 4px 5px 0px rgba(0,0,0,.1);
+  outline: none;
+}
+
+.btn-16 {
+  border: none;
+  color: #000;
+}
+
+.btn-16:after {
+  position: absolute;
+  content: "";
+  width: 0;
+  height: 100%;
+  top: 0;
+  left: 0;
+  direction: rtl;
+  z-index: -1;
+  box-shadow:
+   -7px -7px 20px 0px #ffffff,
+   -4px -4px 5px 0px #fff9,
+   7px 7px 20px 0px #0002,
+   4px 4px 5px 0px #0001;
+  transition: all 0.3s ease;
+}
+
+.btn-16:hover {
+  color: #000;
+}
+
+.btn-16:hover:after {
+  left: auto;
+  right: 0;
+  width: 100%;
+}
+
+.btn-16:active {
+  top: 2px;
+}

@@ -1,4 +1,13 @@
 // modal.js
+
+    function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section.style.display === 'none' || section.style.display === '') {
+        section.style.display = 'block';
+    } else {
+        section.style.display = 'none';
+    }
+}
 document.addEventListener('DOMContentLoaded', function () {
     // Переменные для модального окна входа
     const loginModal = document.getElementById('loginModal');
@@ -89,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } catch (e) {
                         console.error('Ошибка обработки ответа:', e);
                         loginError.style.display = 'block';
-                        loginError.innerHTML = 'Произошла ошибка при обработке ответа сервера.';
+                        loginError.innerHTML = 'Произошла ошибка: проверьте учетные данные';
                     }
                 } else {
                     console.error('Ошибка сервера:', xhr.status);
@@ -177,12 +186,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     } catch (e) {
                         console.error('Ошибка обработки ответа:', e);
                         signupError.style.display = 'block';
-                        signupError.innerHTML = 'Произошла ошибка при обработке ответа сервера.';
+                        signupError.innerHTML = 'Произошла ошибка: проверьте учетные данные';
                     }
                 } else {
                     console.error('Ошибка сервера:', xhr.status);
                     signupError.style.display = 'block';
-                    signupError.innerHTML = 'Ошибка сервера. Пожалуйста, попробуйте позже.';
+                    signupError.innerHTML = 'Произошла ошибка: проверьте учетные данные';
                 }
             };
             xhr.onerror = function () {
@@ -193,4 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
             xhr.send(formData);
         });
     }
+
+    document.getElementById('photosSection').style.display = 'none';
+    document.getElementById('linksSection').style.display = 'none';
 });
