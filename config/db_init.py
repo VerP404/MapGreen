@@ -1,4 +1,9 @@
+import sys
 import os
+
+# Добавление пути проекта в PYTHONPATH
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import django
 from django.core.management import call_command
 from django.contrib.auth import get_user_model
