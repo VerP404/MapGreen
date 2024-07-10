@@ -17,6 +17,10 @@ from django.conf import settings
 import logging
 
 
+def check_auth(request):
+    is_authenticated = request.user.is_authenticated
+    return JsonResponse({'isAuthenticated': is_authenticated})
+
 def index(request):
     objects = Object.objects.filter(is_published=True).values('name', 'description', 'latitude', 'longitude',
                                                               'type_object__color', 'type_object_id')

@@ -1,7 +1,7 @@
 # urls.py
 from django.urls import path
 from .views import add_object, index, profile_view, register, project_list_view, CustomLoginView, category_list, \
-    get_type_objects_by_category, get_published_objects, about_us, object_modal
+    get_type_objects_by_category, get_published_objects, about_us, object_modal, check_auth
 from allauth.account.views import LoginView, LogoutView
 
 urlpatterns = [
@@ -17,4 +17,5 @@ urlpatterns = [
     path('api/objects/', get_published_objects, name='get_published_objects'),
     path('about_us/', about_us, name='about_us'),
     path('object/<int:object_id>/modal/', object_modal, name='object_modal'),
+    path('api/check_auth/', check_auth, name='check_auth'),
 ]

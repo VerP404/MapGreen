@@ -7,13 +7,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const confirmBtn = document.getElementById('confirmBtn');
     const cancelBtn = document.getElementById('cancelBtn');
     const closeFormModalBtn = document.getElementById('closeFormModalBtn');
+    const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
     const categorySelect = document.getElementById('category');
     const typeObjectSelect = document.getElementById('type_object');
     const latitudeInput = document.getElementById('latitude');
     const longitudeInput = document.getElementById('longitude');
+    let  isAuthenticated = false;
     let isAddingObject = false;
     let marker;
 
+    function checkAuth() {
+        return fetch('/api/check_auth/')
+            .then(response => response.json())
+            .then(data => data.isAuthenticated);
+    }
     function showModal(modal) {
         modal.style.display = 'block';
     }
@@ -50,17 +57,17 @@ document.addEventListener('DOMContentLoaded', function () {
     function removeImage(id) {
         const imageContainer = document.getElementById(id);
         imageContainer.innerHTML = '<input type="file" accept="image/*" onchange="loadImage(event, \'' + id + '\')">' +
-                                   '<span class="delete-icon" onclick="removeImage(\'' + id + '\')">&times;</span>';
+            '<span class="delete-icon" onclick="removeImage(\'' + id + '\')">&times;</span>';
     }
 
     // Новая функция для предпросмотра изображений
     function previewImages() {
         const imageInputs = document.querySelectorAll('input[type="file"]');
         imageInputs.forEach(input => {
-            input.addEventListener('change', function(event) {
+            input.addEventListener('change', function (event) {
                 const file = event.target.files[0];
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const imgElement = document.createElement('img');
                     imgElement.src = e.target.result;
                     imgElement.style.maxWidth = '100px'; // Или любое другое значение для предпросмотра
@@ -73,10 +80,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (addObjectBtn) {
-        addObjectBtn.addEventListener('click', function () {
-            selectPointMessage.style.display = 'block';
-            document.getElementById('map').style.cursor = 'crosshair';
-            isAddingObject = true;
+        addObjectBtn.addEventListener('click', async function () {
+            isAuthenticated = await checkAuth(); // Обновляем переменную состояния после завершения запроса
+            if (isAuthenticated) {
+                selectPointMessage.style.display = 'block';
+                document.getElementById('map').style.cursor = 'crosshair';
+                isAddingObject = true;
+            } else {
+                showModal(authRequiredModal);
+            }
         });
     }
 
@@ -86,6 +98,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    if (closeAuthModalBtn) {
+        closeAuthModalBtn.addEventListener('click', function () {
+            hideModal(authRequiredModal);
+        });
+    }
     if (confirmBtn) {
         confirmBtn.addEventListener('click', function () {
             confirmSelectionMessage.style.display = 'none';
