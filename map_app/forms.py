@@ -93,8 +93,14 @@ class CustomSignupForm(SignupForm):
 
 
 ICON_CHOICES = [
-    ('ri-file-list-line', 'ri-file-list-line'),
     ('ri-drop-line', 'ri-drop-line'),
+    ('ri-tree-line', 'ri-tree-line'),
+    ('ri-windy-line', 'ri-windy-line'),
+    ('ri-plant-line', 'ri-plant-line'),
+    ('ri-building-2-line', 'ri-building-2-line'),
+    ('ri-temp-hot-line', 'ri-temp-hot-line'),
+    ('ri-presentation-line', 'ri-presentation-line'),
+    ('ri-file-list-line', 'ri-file-list-line'),
     ('ri-user-line', 'ri-user-line'),
     ('ri-star-line', 'ri-star-line'),
     ('ri-heart-line', 'ri-heart-line'),
@@ -111,7 +117,8 @@ ICON_CHOICES = [
     ('ri-earth-line', 'ri-earth-line'),
     ('ri-fire-line', 'ri-fire-line'),
     ('ri-seedling-line', 'ri-seedling-line'),
-    ('ri-tree-line', 'ri-tree-line'),
+    ('ri-tree-fill', 'ri-tree-fill'),
+    ('ri-leaf-line', 'ri-leaf-line'),
     ('ri-palm-tree-line', 'ri-palm-tree-line'),
 ]
 
