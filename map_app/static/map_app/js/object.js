@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const typeObjectSelect = document.getElementById('type_object');
     const latitudeInput = document.getElementById('latitude');
     const longitudeInput = document.getElementById('longitude');
-    let  isAuthenticated = false;
+    let isAuthenticated = false;
     let isAddingObject = false;
     let marker;
 
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => data.isAuthenticated);
     }
+
     function showModal(modal) {
         modal.style.display = 'block';
     }
@@ -166,6 +167,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    function clearForm() {
+        const form = document.getElementById('objectForm');
+        form.reset();
+
+        // Удалить изображения из предпросмотра
+        const imageInputs = document.querySelectorAll('.image-input');
+        imageInputs.forEach(input => {
+            input.innerHTML = '<input type="file" name="photos" accept="image/*" onchange="loadImage(event, \'' + input.id + '\')">' +
+                '<span class="delete-icon" onclick="removeImage(\'' + input.id + '\')">&times;</span>';
+        });
+
+        // Очистить изображения
+        const imgElements = document.querySelectorAll('.image-input img');
+        imgElements.forEach(img => img.remove());
+
+        // Скрыть разделы
+        document.getElementById('photosSection').style.display = 'none';
+        document.getElementById('linksSection').style.display = 'none';
+    }
+
     document.getElementById('objectForm').addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -182,6 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     setTimeout(() => {
                         successMessage.style.display = 'none';
                     }, 3000);
+                    clearForm();
                 } else {
                     console.log(data.errors);
                 }

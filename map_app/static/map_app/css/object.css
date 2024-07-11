@@ -3,7 +3,7 @@
 /* Кнопка для добавления объекта */
 .add-object-btn {
     position: absolute;
-    bottom: 20px;
+    bottom: 40px;
     right: 20px;
     background-color: #4CAF50;
     color: white;

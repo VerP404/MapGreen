@@ -1,6 +1,6 @@
 // map.js
 document.addEventListener('DOMContentLoaded', function () {
-    var map = L.map('map').setView([54.735152, 55.958722], 5);
+    var map = L.map('map').setView([55.755811, 37.617617], 5);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
