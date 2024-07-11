@@ -7,7 +7,7 @@
     {% if category %}
     <div class="projects-header">
         <h2>{{ category.name }}</h2>
-        <p>{{ category.description }}</p>
+        <div class="category-description">{{ category.description|safe }}</div>
     </div>
     {% else %}
     <div class="projects-header">

@@ -5,11 +5,12 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.deconstruct import deconstructible
+from ckeditor.fields import RichTextField
 
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    description = RichTextField(blank=True)
     color = models.CharField(max_length=7, unique=False, default='#0000FF')
     icon = models.CharField(max_length=50, default='ri-file-list-line')
 
@@ -20,7 +21,7 @@ class Category(models.Model):
 class TypeObject(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='types')
     name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    description = RichTextField(blank=True)
     color = models.CharField(max_length=7, unique=True)
 
     def __str__(self):
@@ -118,3 +119,10 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class AboutPage(models.Model):
+    content = RichTextField(blank=True)
+
+    def __str__(self):
+        return "О нас"

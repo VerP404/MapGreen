@@ -43,7 +43,11 @@ INSTALLED_APPS = [
     'allauth.account',
     'import_export',
 
+    'ckeditor',
+    'ckeditor_uploader',
+
     'map_app',
+
 ]
 SITE_ID = 1
 MIDDLEWARE = [
@@ -142,3 +146,17 @@ AUTH_USER_MODEL = 'map_app.CustomUser'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Путь, куда будут загружаться файлы CKEditor
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+        'allowedContent': True,  # Разрешить все типы содержимого
+        'extraAllowedContent': 'p h1 h2 h3 h4 h5 h6 blockquote; a[!href]; img[left,right][!src,alt,width,height]; table tr th td caption; span{!font-family}; span{!color}; span(!marker); del ins',  # Разрешить определенные дополнительные элементы
+        'forcePasteAsPlainText': True,  # Вставлять текст как простой текст
+        'removePlugins': 'stylesheetparser',  # Удалить лишние плагины
+    }
+}

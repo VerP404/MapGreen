@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from allauth.account.views import SignupView, LoginView
-from .models import Category, Object, TypeObject, Photo, Link
+from .models import Category, Object, TypeObject, Photo, Link, AboutPage
 from .forms import ObjectForm, CustomUserCreationForm, CustomSignupForm, PhotoFormSet, LinkFormSet
 from allauth.account.forms import LoginForm, SignupForm
 from django.contrib.auth import login as auth_login
@@ -215,8 +215,8 @@ def get_published_objects(request):
 
 
 def about_us(request):
-    return render(request, 'map_app/about_us.html')
-
+    about_pages = AboutPage.objects.all()
+    return render(request, 'map_app/about_us.html', {'about_pages': about_pages})
 
 def object_modal(request, object_id):
     obj = get_object_or_404(Object, pk=object_id)

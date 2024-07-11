@@ -1,6 +1,6 @@
 # admin.py
 from django.contrib import admin
-from .models import TypeObject, Category, Object, CustomUser, Photo
+from .models import TypeObject, Category, Object, CustomUser, Photo, AboutPage
 from django.contrib.auth.admin import UserAdmin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
@@ -81,12 +81,18 @@ class ObjectResource(resources.ModelResource):
 
 class ObjectAdmin(ImportExportModelAdmin):
     resource_class = ObjectResource
-    list_display = ('name', 'description', 'is_published', 'latitude', 'longitude', 'type_object', 'user', 'is_published')
+    list_display = (
+    'name', 'description', 'is_published', 'latitude', 'longitude', 'type_object', 'user', 'is_published')
     list_filter = ('type_object', 'user', 'is_published')
     search_fields = ('name', 'description', 'type_object__name', 'user__email')
     inlines = [PhotoInline]
 
 
+class AboutPageAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(AboutPage, AboutPageAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(TypeObject, TypeObjectAdmin)
 admin.site.register(Object, ObjectAdmin)
