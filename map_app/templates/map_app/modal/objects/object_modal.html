@@ -43,11 +43,11 @@
     </div>
 
     <div class="about">
+        <h3>Описание объекта</h3>
         <p>{{ object.description }}</p>
     </div>
     <div class="about">
         <h3>Подробнее об объектах категории: {{ object.type_object.category.name }}</h3>
-{#        <p>{{ object.type_object.category.description }}</p>#}
         <div class="category-description">{{ object.type_object.category.description|safe }}</div>
     </div>
     <div class="links">
